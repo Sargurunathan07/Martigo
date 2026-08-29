@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+
 import '../features/auth/splash_screen.dart';
 import '../features/auth/onboarding_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/forgot_password_screen.dart';
+import '../features/community/join_community_screen.dart';
+import '../features/community/enter_community_code_screen.dart';
+import '../features/community/scan_qr_screen.dart';
+import '../features/community/community_confirmation_screen.dart';
 import '../features/customer/customer_home_shell.dart';
 import '../features/customer/my_orders_screen.dart';
 import '../features/customer/notifications_screen.dart';
 import '../features/customer/profile_screen.dart';
+import '../features/admin/admin_dashboard_shell.dart';
 
-/// Centralized route name definitions and route table for Martigo.
-///
-/// Screens that do not have a real implementation yet are wired to
-/// [_PlaceholderScreen] so navigation can be built out before the
-/// actual feature screens exist.
 class AppRoutes {
   AppRoutes._();
 
@@ -24,6 +25,9 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String joinCommunity = '/join-community';
+  static const String enterCommunityCode = '/enter-community-code';
+  static const String scanCommunityQr = '/scan-community-qr';
+  static const String communityConfirmation = '/community-confirmation';
 
   // Customer
   static const String customerHome = '/customer-home';
@@ -55,8 +59,27 @@ class AppRoutes {
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
-    joinCommunity: (context) =>
-        const _PlaceholderScreen(title: 'Join Community'),
+    joinCommunity: (context) => const JoinCommunityScreen(),
+
+    enterCommunityCode: (context) => const EnterCommunityCodeScreen(),
+
+    scanCommunityQr: (context) => const ScanQrScreen(),
+
+    communityConfirmation: (context) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+      if (args == null) {
+        return const JoinCommunityScreen();
+      }
+
+      return CommunityConfirmationScreen(
+        name: args['name'] as String? ?? '',
+        type: args['type'] as String? ?? '',
+        business: args['business'] as String? ?? '',
+        code: args['code'] as String? ?? '',
+      );
+    },
     customerHome: (context) => const CustomerHomeShell(),
     productCategories: (context) =>
         const _PlaceholderScreen(title: 'Product Categories'),
@@ -83,8 +106,7 @@ class AppRoutes {
         const _PlaceholderScreen(title: 'Community Management'),
     orderDeadline: (context) =>
         const _PlaceholderScreen(title: 'Order Deadline'),
-    adminDashboard: (context) =>
-        const _PlaceholderScreen(title: 'Admin Dashboard'),
+    adminDashboard: (context) => const AdminDashboardShell(),
   };
 }
 
