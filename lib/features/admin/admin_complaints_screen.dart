@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/app_card.dart';
 
 class AdminComplaintsScreen extends StatelessWidget {
   const AdminComplaintsScreen({super.key});
 
   static const List<Map<String, String>> _complaints = [
-    {'title': 'Delayed pickup', 'community': 'Sunrise Apartments', 'status': 'Open'},
-    {'title': 'Wrong item delivered', 'community': 'ABC Engineering College', 'status': 'Resolved'},
+    {
+      'title': 'Delayed pickup',
+      'community': 'Sunrise Apartments',
+      'status': 'Open',
+    },
+    {
+      'title': 'Wrong item delivered',
+      'community': 'ABC Engineering College',
+      'status': 'Resolved',
+    },
   ];
 
   @override

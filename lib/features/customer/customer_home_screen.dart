@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../models/community.dart';
 import '../../models/order.dart';
@@ -20,9 +21,11 @@ class CustomerHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final community = CustomerMockData.currentCommunity;
     final upcomingOrders = CustomerMockData.orders
-        .where((o) =>
-            o.status != OrderStatus.completed &&
-            o.status != OrderStatus.cancelled)
+        .where(
+          (o) =>
+              o.status != OrderStatus.completed &&
+              o.status != OrderStatus.cancelled,
+        )
         .toList();
 
     return Scaffold(
@@ -79,10 +82,7 @@ class _CommunityBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(community.name, style: textTheme.titleMedium),
-                Text(
-                  community.businessName ?? '',
-                  style: textTheme.bodySmall,
-                ),
+                Text(community.businessName ?? '', style: textTheme.bodySmall),
               ],
             ),
           ),
@@ -189,7 +189,10 @@ class _MealPlaceholderCard extends StatelessWidget {
     return AppCard(
       child: Row(
         children: [
-          const Icon(Icons.restaurant_menu_outlined, color: AppColors.primaryMaroon),
+          const Icon(
+            Icons.restaurant_menu_outlined,
+            color: AppColors.primaryMaroon,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
@@ -249,8 +252,10 @@ class _UpcomingOrdersList extends StatelessWidget {
               child: AppCard(
                 child: Row(
                   children: [
-                    const Icon(Icons.event_available_outlined,
-                        color: AppColors.primaryMaroon),
+                    const Icon(
+                      Icons.event_available_outlined,
+                      color: AppColors.primaryMaroon,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -278,8 +283,18 @@ class _UpcomingOrdersList extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]}';
   }

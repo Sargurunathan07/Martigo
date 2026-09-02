@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import 'customer_mock_data.dart';
 
@@ -17,8 +18,18 @@ class NotificationsScreen extends StatelessWidget {
 
   String _formatTimestamp(DateTime timestamp) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final hour = timestamp.hour % 12 == 0 ? 12 : timestamp.hour % 12;
     final period = timestamp.hour >= 12 ? 'PM' : 'AM';
@@ -35,10 +46,7 @@ class NotificationsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Notifications')),
       body: notifications.isEmpty
           ? Center(
-              child: Text(
-                'No notifications yet.',
-                style: textTheme.bodyMedium,
-              ),
+              child: Text('No notifications yet.', style: textTheme.bodyMedium),
             )
           : ListView.separated(
               padding: const EdgeInsets.all(20),

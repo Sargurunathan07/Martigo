@@ -5,10 +5,22 @@ import '../../core/utils/validators.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
-/// Login screen.
+/// Martigo shared login screen.
 ///
-/// Development authentication only.
-/// Real role-based authentication will be connected to the backend later.
+/// Current authentication is mock/local only.
+///
+/// Development roles:
+///
+/// Customer:
+/// Any valid email/password.
+///
+/// Seller:
+/// seller@martigo.com
+/// seller123
+///
+/// Admin:
+/// admin@martigo.com
+/// admin123
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -24,7 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
 
-  // Temporary development admin credentials.
+  static const String _sellerEmail = 'seller@martigo.com';
+  static const String _sellerPassword = 'seller123';
+
   static const String _adminEmail = 'admin@martigo.com';
   static const String _adminPassword = 'admin123';
 
@@ -44,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    // Mock authentication delay.
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (!mounted) return;
@@ -56,25 +69,24 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = false;
     });
 
-    // -----------------------------------------
-    // ADMIN LOGIN
-    // -----------------------------------------
+    // ADMIN
     if (email == _adminEmail && password == _adminPassword) {
       Navigator.of(context)
           .pushNamedAndRemoveUntil(AppRoutes.adminDashboard, (route) => false);
-
       return;
     }
 
-    // -----------------------------------------
-    // CUSTOMER LOGIN
-    // -----------------------------------------
+    // SELLER
+    if (email == _sellerEmail && password == _sellerPassword) {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(AppRoutes.sellerDashboard, (route) => false);
+      return;
+    }
+
+    // CUSTOMER
     //
-    // For development, any other valid
-    // email/password is treated as a customer.
-    //
-    // Customer must join/select a community
-    // before entering the main Martigo app.
+    // During mock development, every other valid login
+    // is considered a Customer account.
     Navigator.of(context)
         .pushNamedAndRemoveUntil(AppRoutes.joinCommunity, (route) => false);
   }
@@ -85,6 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onCreateAccountPressed() {
     Navigator.of(context).pushNamed(AppRoutes.register);
+  }
+
+  void _openSellerPortal() {
+    Navigator.of(context).pushNamed(AppRoutes.sellerWelcome);
   }
 
   @override
@@ -109,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 4),
 
                     Text(
-                      'Login to continue pre-ordering with Martigo.',
+                      'Login to continue with Martigo.',
                       style: textTheme.bodyMedium,
                     ),
 
@@ -151,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _onLoginPressed,
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -162,6 +178,45 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text('Create Account'),
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: _openSellerPortal,
+                        icon: const Icon(Icons.storefront_outlined),
+                        label: const Text('Open Seller Portal'),
+                      ),
+                    ),
+
+                    const SizedBox(height: 26),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5E1E5),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Development accounts',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5A0015),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text('Seller: seller@martigo.com / seller123'),
+                          SizedBox(height: 4),
+                          Text('Admin: admin@martigo.com / admin123'),
+                          SizedBox(height: 4),
+                          Text('Customer: use any other valid email/password'),
+                        ],
+                      ),
                     ),
                   ],
                 ),

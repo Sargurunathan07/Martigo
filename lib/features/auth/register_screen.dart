@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../app/routes.dart';
 import '../../core/utils/validators.dart';
 import '../../widgets/app_button.dart';
@@ -40,10 +41,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.joinCommunity,
-      (route) => false,
-    );
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.joinCommunity, (route) => false);
   }
 
   @override

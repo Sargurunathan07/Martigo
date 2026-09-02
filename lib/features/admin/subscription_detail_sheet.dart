@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../widgets/app_button.dart';
 import 'admin_mock_data.dart';
@@ -50,8 +51,18 @@ class _SubscriptionDetailSheetState extends State<_SubscriptionDetailSheet> {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
@@ -170,9 +181,7 @@ class _DetailRow extends StatelessWidget {
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
           Text(
             value,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
+            style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],

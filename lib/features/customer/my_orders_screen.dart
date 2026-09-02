@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../models/order.dart';
 import '../../widgets/app_card.dart';
@@ -15,8 +16,10 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabController =
-      TabController(length: 3, vsync: this);
+  late final TabController _tabController = TabController(
+    length: 3,
+    vsync: this,
+  );
 
   @override
   void dispose() {
@@ -29,9 +32,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     switch (index) {
       case 0:
         return orders
-            .where((o) =>
-                o.status != OrderStatus.completed &&
-                o.status != OrderStatus.cancelled)
+            .where(
+              (o) =>
+                  o.status != OrderStatus.completed &&
+                  o.status != OrderStatus.cancelled,
+            )
             .toList();
       case 1:
         return orders.where((o) => o.status == OrderStatus.completed).toList();
@@ -102,8 +107,18 @@ class _OrdersList extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
@@ -140,9 +155,9 @@ class _OrdersList extends StatelessWidget {
                     Text(
                       _statusLabel(order.status),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _statusColor(order.status),
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: _statusColor(order.status),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -185,9 +200,9 @@ class _OrdersList extends StatelessWidget {
                     Text(
                       '₹${order.total.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryMaroon,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryMaroon,
+                      ),
                     ),
                   ],
                 ),

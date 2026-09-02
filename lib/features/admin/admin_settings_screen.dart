@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/app_card.dart';
 
 class AdminSettingsScreen extends StatelessWidget {

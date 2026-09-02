@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../app/routes.dart';
 import '../../core/constants/app_colors.dart';
 import '../../widgets/app_button.dart';
@@ -42,8 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingPageData(
       icon: Icons.eco_outlined,
       title: 'Less waste. Better planning.',
-      description:
-          'Help your local supermarket or canteen prepare better.',
+      description: 'Help your local supermarket or canteen prepare better.',
     ),
   ];
 

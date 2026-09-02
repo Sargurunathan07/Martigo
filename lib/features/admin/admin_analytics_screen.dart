@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/app_card.dart';
 import 'admin_mock_data.dart';
 
@@ -10,7 +11,10 @@ class AdminAnalyticsScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Platform Analytics', style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          'Platform Analytics',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 12),
         AppCard(
           child: Column(
@@ -26,10 +30,7 @@ class AdminAnalyticsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(point.label),
-                      Text('${point.value} units'),
-                    ],
+                    children: [Text(point.label), Text('${point.value} units')],
                   ),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../widgets/app_card.dart';
 import 'admin_mock_data.dart';
@@ -33,8 +34,18 @@ class MonthlySubscriptionsScreen extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
@@ -100,8 +111,8 @@ class MonthlySubscriptionsScreen extends StatelessWidget {
             final crossAxisCount = constraints.maxWidth >= 900
                 ? 4
                 : constraints.maxWidth >= 600
-                    ? 2
-                    : 1;
+                ? 2
+                : 1;
             return GridView.count(
               crossAxisCount: crossAxisCount,
               shrinkWrap: true,
@@ -167,19 +178,25 @@ class MonthlySubscriptionsScreen extends StatelessWidget {
                             _onAction(context, action, subscription),
                         itemBuilder: (context) => const [
                           PopupMenuItem(
-                              value: 'view', child: Text('View subscription')),
+                            value: 'view',
+                            child: Text('View subscription'),
+                          ),
                           PopupMenuItem(
-                              value: 'activate',
-                              child: Text('Activate subscription')),
+                            value: 'activate',
+                            child: Text('Activate subscription'),
+                          ),
                           PopupMenuItem(
-                              value: 'renew',
-                              child: Text('Renew subscription')),
+                            value: 'renew',
+                            child: Text('Renew subscription'),
+                          ),
                           PopupMenuItem(
-                              value: 'change_plan',
-                              child: Text('Change plan')),
+                            value: 'change_plan',
+                            child: Text('Change plan'),
+                          ),
                           PopupMenuItem(
-                              value: 'cancel',
-                              child: Text('Cancel subscription')),
+                            value: 'cancel',
+                            child: Text('Cancel subscription'),
+                          ),
                         ],
                       ),
                     ],
@@ -212,9 +229,7 @@ class MonthlySubscriptionsScreen extends StatelessWidget {
                     children: [
                       Text(
                         '₹${subscription.plan.monthlyPrice.toStringAsFixed(0)} / month',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
+                        style: Theme.of(context).textTheme.bodyMedium
                             ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
@@ -267,9 +282,7 @@ class _SummaryCard extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
+                  style: Theme.of(context).textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -313,10 +326,8 @@ class _StatusChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: color, fontWeight: FontWeight.w600),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../app/routes.dart';
 import '../../core/constants/app_colors.dart';
 import 'customer_mock_data.dart';
@@ -9,10 +10,8 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   void _onLogoutPressed(BuildContext context) {
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.login,
-      (route) => false,
-    );
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
   }
 
   @override
@@ -116,9 +115,8 @@ class _ProfileMenuTile extends StatelessWidget {
       leading: Icon(icon, color: iconColor ?? AppColors.primaryMaroon),
       title: Text(
         label,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: labelColor,
-            ),
+        style: Theme.of(context).textTheme.bodyLarge
+            ?.copyWith(color: labelColor),
       ),
       trailing: const Icon(Icons.chevron_right, size: 20),
       onTap: onTap,

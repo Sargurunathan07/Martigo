@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'customer_home_screen.dart';
 import 'my_orders_screen.dart';
 import 'notifications_screen.dart';
@@ -26,10 +27,7 @@ class _CustomerHomeShellState extends State<CustomerHomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _tabs,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),

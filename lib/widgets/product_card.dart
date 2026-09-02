@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../core/constants/app_colors.dart';
 import '../models/product.dart';
 import 'app_button.dart';
@@ -25,7 +26,8 @@ class ProductCard extends StatelessWidget {
     this.onTap,
   });
 
-  bool get _isAvailable => product.availability == ProductAvailability.available;
+  bool get _isAvailable =>
+      product.availability == ProductAvailability.available;
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +64,7 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        '/ ${product.unit}',
-                        style: textTheme.bodySmall,
-                      ),
+                      Text('/ ${product.unit}', style: textTheme.bodySmall),
                     ],
                   ),
                   const SizedBox(height: 6),

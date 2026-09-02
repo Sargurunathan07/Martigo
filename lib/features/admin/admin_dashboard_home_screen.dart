@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../widgets/app_card.dart';
 import 'admin_mock_data.dart';
@@ -57,8 +58,8 @@ class AdminDashboardHomeScreen extends StatelessWidget {
             final crossAxisCount = constraints.maxWidth >= 900
                 ? 3
                 : constraints.maxWidth >= 600
-                    ? 2
-                    : 1;
+                ? 2
+                : 1;
             return GridView.count(
               crossAxisCount: crossAxisCount,
               shrinkWrap: true,
@@ -71,8 +72,10 @@ class AdminDashboardHomeScreen extends StatelessWidget {
           },
         ),
         const SizedBox(height: 24),
-        Text('Weekly Demand Trend',
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          'Weekly Demand Trend',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 8),
         AppCard(
           child: _DemandTrendBars(points: AdminMockData.weeklyDemandTrend),
@@ -86,8 +89,10 @@ class AdminDashboardHomeScreen extends StatelessWidget {
             child: AppCard(
               child: Row(
                 children: [
-                  const Icon(Icons.circle_notifications_outlined,
-                      color: AppColors.primaryMaroon),
+                  const Icon(
+                    Icons.circle_notifications_outlined,
+                    color: AppColors.primaryMaroon,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -95,13 +100,13 @@ class AdminDashboardHomeScreen extends StatelessWidget {
                       children: [
                         Text(
                           item.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
-                        Text(item.subtitle,
-                            style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          item.subtitle,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ),
@@ -155,9 +160,7 @@ class _MetricCard extends StatelessWidget {
               children: [
                 Text(
                   data.value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
+                  style: Theme.of(context).textTheme.titleLarge
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -191,8 +194,10 @@ class _DemandTrendBars extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: points.map((point) {
-          final barHeight =
-              (_maxBarHeight * point.value / maxValue).clamp(6.0, _maxBarHeight);
+          final barHeight = (_maxBarHeight * point.value / maxValue).clamp(
+            6.0,
+            _maxBarHeight,
+          );
           return Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -200,8 +205,10 @@ class _DemandTrendBars extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text('${point.value}',
-                      style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    '${point.value}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   const SizedBox(height: 4),
                   Container(
                     height: barHeight,
@@ -211,7 +218,10 @@ class _DemandTrendBars extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(point.label, style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    point.label,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ],
               ),
             ),

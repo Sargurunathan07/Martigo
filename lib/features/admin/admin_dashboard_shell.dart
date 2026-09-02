@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import 'admin_mock_data.dart';
 import 'admin_models.dart';
@@ -135,8 +136,9 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                   },
                   labelType: NavigationRailLabelType.all,
                   backgroundColor: AppColors.cream,
-                  selectedIconTheme:
-                      const IconThemeData(color: AppColors.primaryMaroon),
+                  selectedIconTheme: const IconThemeData(
+                    color: AppColors.primaryMaroon,
+                  ),
                   selectedLabelTextStyle: const TextStyle(
                     color: AppColors.primaryMaroon,
                     fontWeight: FontWeight.w600,

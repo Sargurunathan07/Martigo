@@ -31,7 +31,9 @@ class AppCard extends StatelessWidget {
           ? content
           : InkWell(
               onTap: onTap,
-              borderRadius: shape.borderRadius.resolve(Directionality.of(context)),
+              borderRadius: shape.borderRadius.resolve(
+                Directionality.of(context),
+              ),
               child: content,
             ),
     );

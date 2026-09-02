@@ -16,17 +16,18 @@ class AppTheme {
   static const double _spacing = 16;
 
   static ThemeData get light {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: primaryMaroon,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: primaryMaroon,
-      secondary: deepMaroon,
-      surface: cream,
-      onPrimary: cream,
-      onSecondary: cream,
-      onSurface: textColor,
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: primaryMaroon,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: primaryMaroon,
+          secondary: deepMaroon,
+          surface: cream,
+          onPrimary: cream,
+          onSecondary: cream,
+          onSurface: textColor,
+        );
 
     final baseTextTheme = _buildTextTheme(textColor);
 

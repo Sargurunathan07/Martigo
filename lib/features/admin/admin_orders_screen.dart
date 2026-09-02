@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/app_card.dart';
 
 class AdminOrdersScreen extends StatelessWidget {
   const AdminOrdersScreen({super.key});
 
   static const List<Map<String, String>> _orders = [
-    {'id': 'o001', 'business': 'Sunrise Supermarket', 'status': 'Confirmed', 'total': '₹165'},
-    {'id': 'o002', 'business': 'ABC Campus Canteen', 'status': 'Pending', 'total': '₹250'},
-    {'id': 'o003', 'business': 'Lakeview Grocers', 'status': 'Completed', 'total': '₹120'},
+    {
+      'id': 'o001',
+      'business': 'Sunrise Supermarket',
+      'status': 'Confirmed',
+      'total': '₹165',
+    },
+    {
+      'id': 'o002',
+      'business': 'ABC Campus Canteen',
+      'status': 'Pending',
+      'total': '₹250',
+    },
+    {
+      'id': 'o003',
+      'business': 'Lakeview Grocers',
+      'status': 'Completed',
+      'total': '₹120',
+    },
   ];
 
   @override
