@@ -14,6 +14,9 @@ import '../features/seller/auth/seller_welcome_screen.dart';
 import '../features/seller/dashboard/seller_home_shell.dart';
 import '../features/seller/preorders/seller_preorders_screen.dart';
 import '../features/seller/stock/stock_management_screen.dart';
+import '../features/community/join_community_screen.dart';
+import '../features/community/join_supermarket_screen.dart';
+import '../features/community/join_college_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -25,6 +28,8 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String joinCommunity = '/join-community';
+  static const String joinSupermarket = '/join-supermarket';
+  static const String joinCollege = '/join-college';
 
   // Customer
   static const String customerHome = '/customer-home';
@@ -57,8 +62,9 @@ class AppRoutes {
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
-    joinCommunity: (context) =>
-        const _PlaceholderScreen(title: 'Join Community'),
+    joinCommunity: (context) => const JoinCommunityScreen(),
+    joinSupermarket: (context) => const JoinSupermarketScreen(),
+    joinCollege: (context) => const JoinCollegeScreen(),
     customerHome: (context) => const CustomerHomeShell(),
     productCategories: (context) =>
         const _PlaceholderScreen(title: 'Product Categories'),

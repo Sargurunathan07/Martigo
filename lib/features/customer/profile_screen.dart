@@ -4,12 +4,54 @@ import '../../app/routes.dart';
 import '../../core/constants/app_colors.dart';
 import 'customer_mock_data.dart';
 
-/// Profile tab. Shows the current mock user, their community, and a
-/// menu of account-related actions.
+/// Customer Profile tab.
+/// Logout is available only for the Customer section.
+/// Admin and Seller logout are handled separately.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  void _onLogoutPressed(BuildContext context) {
+  Future<void> _onLogoutPressed(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Logout?', textAlign: TextAlign.center),
+          content: const Text(
+            'Are you sure you want to logout\n'
+            'from your Martigo account?',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primaryMaroon,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout != true || !context.mounted) {
+      return;
+    }
+
+    // Mock/local authentication for now.
+    // Real customer session/token clearing can be added here later.
+
     Navigator.of(context)
         .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
   }
@@ -51,39 +93,50 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
+
             const SizedBox(height: 24),
+
             _ProfileMenuTile(
               icon: Icons.receipt_long_outlined,
               label: 'My Orders',
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.myOrders),
+              onTap: () {
+                Navigator.of(context).pushNamed(AppRoutes.myOrders);
+              },
             ),
+
             _ProfileMenuTile(
               icon: Icons.groups_outlined,
               label: 'My Community',
               onTap: () {},
             ),
+
             _ProfileMenuTile(
               icon: Icons.bookmark_border,
               label: 'Saved Details',
               onTap: () {},
             ),
+
             _ProfileMenuTile(
               icon: Icons.notifications_none_outlined,
               label: 'Notifications',
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.notifications),
+              onTap: () {
+                Navigator.of(context).pushNamed(AppRoutes.notifications);
+              },
             ),
+
             _ProfileMenuTile(
               icon: Icons.help_outline,
               label: 'Help & Support',
               onTap: () {},
             ),
+
             const Divider(height: 32),
+
             _ProfileMenuTile(
-              icon: Icons.logout,
+              icon: Icons.logout_rounded,
               label: 'Logout',
-              iconColor: Colors.redAccent,
-              labelColor: Colors.redAccent,
+              iconColor: AppColors.primaryMaroon,
+              labelColor: AppColors.primaryMaroon,
               onTap: () => _onLogoutPressed(context),
             ),
           ],

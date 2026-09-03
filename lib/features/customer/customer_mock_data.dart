@@ -1,6 +1,7 @@
 import '../../models/community.dart';
 import '../../models/order.dart';
 import '../../models/user.dart';
+import 'customer_session.dart';
 
 /// Represents a single notification shown to the customer.
 class NotificationItem {
@@ -33,7 +34,9 @@ class CustomerMockData {
 
   /// Change this to `collegeCanteenCommunity` to preview the
   /// college + canteen home layout instead.
-  static const Community currentCommunity = apartmentSupermarketCommunity;
+  static Community get currentCommunity =>
+      CustomerSession.instance.selectedCommunity ??
+      apartmentSupermarketCommunity;
 
   static const Community apartmentSupermarketCommunity = Community(
     id: 'com001',

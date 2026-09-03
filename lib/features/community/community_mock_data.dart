@@ -1,43 +1,92 @@
 import '../../models/community.dart';
 
-/// Mock community directory used for the join-community flow.
-/// Simulates a lookup that would normally come from a backend.
 class CommunityMockData {
   CommunityMockData._();
 
-  static const List<Community> communities = [
-    Community(
-      id: 'com001',
-      name: 'Sunrise Apartments',
-      code: 'SUNRISE-A72',
-      type: CommunityType.apartment,
-      businessName: 'Sunrise Supermarket',
-      businessType: BusinessType.supermarket,
-    ),
-    Community(
-      id: 'com002',
-      name: 'ABC Engineering College',
-      code: 'ABCENGG-C14',
-      type: CommunityType.college,
-      businessName: 'ABC Campus Canteen',
-      businessType: BusinessType.canteen,
-    ),
-  ];
+  static const Community sunriseSupermarket = Community(
+    id: 'com001',
+    name: 'Sunrise Apartments',
+    code: 'SUNRISE-A72',
+    type: CommunityType.apartment,
+    businessName: 'Sunrise Supermarket',
+    businessType: BusinessType.supermarket,
+  );
 
-  /// Mock lookup by community code. Returns null if no match is found.
-  static Community? findByCode(String code) {
-    final normalized = code.trim().toUpperCase();
+  static const Community abcCollege = Community(
+    id: 'com002',
+    name: 'ABC Engineering College',
+    code: 'ABC-COLLEGE',
+    type: CommunityType.college,
+    businessName: 'ABC College Canteen',
+    businessType: BusinessType.canteen,
+  );
+
+  static const List<Community> communities = [sunriseSupermarket, abcCollege];
+
+  static Community? findSupermarket({
+    required String name,
+    required String code,
+  }) {
+    final normalizedName = name.trim().toLowerCase();
+    final normalizedCode = code.trim().toUpperCase();
+
     for (final community in communities) {
-      if (community.code.toUpperCase() == normalized) {
+      if (community.businessType != BusinessType.supermarket) {
+        continue;
+      }
+
+      final businessMatches =
+          community.businessName?.toLowerCase() == normalizedName;
+
+      final communityMatches = community.name.toLowerCase() == normalizedName;
+
+      final codeMatches = community.code.toUpperCase() == normalizedCode;
+
+      if ((businessMatches || communityMatches) && codeMatches) {
         return community;
       }
     }
+
     return null;
   }
 
-  /// Mock "scan result" — simulates a QR code resolving to a community,
-  /// since real camera scanning is not implemented yet.
+  static Community? findCollege({required String name, required String code}) {
+    final normalizedName = name.trim().toLowerCase();
+    final normalizedCode = code.trim().toUpperCase();
+
+    for (final community in communities) {
+      if (community.type != CommunityType.college) {
+        continue;
+      }
+
+      final collegeMatches = community.name.toLowerCase() == normalizedName;
+
+      final businessMatches =
+          community.businessName?.toLowerCase() == normalizedName;
+
+      final codeMatches = community.code.toUpperCase() == normalizedCode;
+
+      if ((collegeMatches || businessMatches) && codeMatches) {
+        return community;
+      }
+    }
+
+    return null;
+  }
+
+  static Community? findByCode(String code) {
+    final normalizedCode = code.trim().toUpperCase();
+
+    for (final community in communities) {
+      if (community.code.toUpperCase() == normalizedCode) {
+        return community;
+      }
+    }
+
+    return null;
+  }
+
   static Community simulateScanResult() {
-    return communities.first;
+    return sunriseSupermarket;
   }
 }

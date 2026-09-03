@@ -1,90 +1,101 @@
 import 'package:flutter/material.dart';
 
-class JoinCommunityScreen extends StatelessWidget {
+import '../customer/customer_session.dart';
+
+class JoinCommunityScreen extends StatefulWidget {
   const JoinCommunityScreen({super.key});
 
   static const String routeName = '/join-community';
 
   @override
+  State<JoinCommunityScreen> createState() => _JoinCommunityScreenState();
+}
+
+class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _prepare();
+  }
+
+  Future<void> _prepare() async {
+    await CustomerSession.instance.load();
+
+    if (!mounted) return;
+
+    if (CustomerSession.instance.hasCommunity) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/customer-home', (route) => false);
+      });
+
+      return;
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF800020)),
+        ),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Join Community'), centerTitle: true),
+      backgroundColor: const Color(0xFFFFFDFC),
+      appBar: AppBar(
+        title: const Text('Join Your Community'),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
+            constraints: const BoxConstraints(maxWidth: 560),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(
-                    Icons.groups_rounded,
-                    size: 72,
-                    color: Color(0xFF800020),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Join your community',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF292323),
-                    ),
-                  ),
                   const SizedBox(height: 12),
-                  Text(
-                    'Connect with your apartment or college community '
-                    'to access its supermarket or canteen.',
+
+                  const Text(
+                    'Choose where you want to order from',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge
-                        ?.copyWith(color: Colors.black54, height: 1.5),
+                    style: TextStyle(fontSize: 17, color: Colors.black54),
                   ),
-                  const SizedBox(height: 40),
-                  _CommunityOptionCard(
-                    icon: Icons.qr_code_scanner_rounded,
-                    title: 'Scan QR Code',
-                    subtitle: 'Scan your community QR code',
+
+                  const SizedBox(height: 36),
+
+                  _CommunityChoiceCard(
+                    icon: Icons.storefront_rounded,
+                    title: 'Supermarket',
+                    description: 'Pre-order groceries and everyday essentials',
+                    buttonText: 'Join Supermarket',
                     onTap: () {
-                      Navigator.pushNamed(context, '/scan-community-qr');
+                      Navigator.pushNamed(context, '/join-supermarket');
                     },
                   ),
-                  const SizedBox(height: 18),
-                  _CommunityOptionCard(
-                    icon: Icons.pin_rounded,
-                    title: 'Enter Community Code',
-                    subtitle: 'Enter the code provided by your community',
+
+                  const SizedBox(height: 22),
+
+                  _CommunityChoiceCard(
+                    icon: Icons.school_rounded,
+                    title: 'College',
+                    description: 'Pre-order meals from your college canteen',
+                    buttonText: 'Join College',
                     onTap: () {
-                      Navigator.pushNamed(context, '/enter-community-code');
+                      Navigator.pushNamed(context, '/join-college');
                     },
-                  ),
-                  const SizedBox(height: 32),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5E1E5),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          color: Color(0xFF800020),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Your community connects you with the correct '
-                            'supermarket or canteen in Martigo.',
-                            style: TextStyle(
-                              color: Color(0xFF292323),
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -96,69 +107,87 @@ class JoinCommunityScreen extends StatelessWidget {
   }
 }
 
-class _CommunityOptionCard extends StatelessWidget {
+class _CommunityChoiceCard extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String description;
+  final String buttonText;
   final VoidCallback onTap;
 
-  const _CommunityOptionCard({
+  const _CommunityChoiceCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
+    required this.description,
+    required this.buttonText,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFFFF7F0),
-      borderRadius: BorderRadius.circular(20),
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(color: const Color(0xFFF5E1E5)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0D000000),
+                blurRadius: 18,
+                offset: Offset(0, 5),
+              ),
+            ],
           ),
-          child: Row(
+          child: Column(
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 76,
+                height: 76,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5E1E5),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(22),
                 ),
-                child: Icon(icon, color: const Color(0xFF800020), size: 28),
+                child: Icon(icon, size: 38, color: const Color(0xFF800020)),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF292323),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(color: Colors.black54),
-                    ),
-                  ],
+
+              const SizedBox(height: 20),
+
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF292323),
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 18,
-                color: Color(0xFF800020),
+
+              const SizedBox(height: 8),
+
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54, height: 1.4),
+              ),
+
+              const SizedBox(height: 22),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FilledButton.icon(
+                  onPressed: onTap,
+                  icon: Icon(icon),
+                  label: Text(buttonText),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF800020),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
