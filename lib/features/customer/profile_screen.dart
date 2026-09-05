@@ -53,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
     // Real customer session/token clearing can be added here later.
 
     Navigator.of(context)
-        .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+        .pushNamedAndRemoveUntil(AppRoutes.roleSelection, (route) => false);
   }
 
   @override

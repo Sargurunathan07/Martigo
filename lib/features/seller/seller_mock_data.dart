@@ -74,7 +74,7 @@ class SellerDataStore {
     SellerPreOrder(
       id: 'MRT1024',
       customerLabel: 'Apartment Resident',
-      pickupDate: DateTime(2026, 9, 3),
+      pickupDate: DateTime.now(),
       pickupTime: '8:00 AM',
       items: const [
         SellerPreOrderItem(productName: 'Milk', quantity: 2),
@@ -87,7 +87,7 @@ class SellerDataStore {
     SellerPreOrder(
       id: 'MRT1025',
       customerLabel: 'Apartment Resident',
-      pickupDate: DateTime(2026, 9, 3),
+      pickupDate: DateTime.now().add(const Duration(days: 1)),
       pickupTime: '9:00 AM',
       items: const [
         SellerPreOrderItem(productName: 'Curd', quantity: 2),
@@ -99,7 +99,7 @@ class SellerDataStore {
     SellerPreOrder(
       id: 'MRT1010',
       customerLabel: 'Apartment Resident',
-      pickupDate: DateTime(2026, 8, 27),
+      pickupDate: DateTime.now().subtract(const Duration(days: 2)),
       pickupTime: '8:30 AM',
       items: const [SellerPreOrderItem(productName: 'Milk', quantity: 1)],
       total: 30,
@@ -153,6 +153,65 @@ class SellerDataStore {
       isRead: true,
     ),
   ];
+
+  bool _sameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  List<SellerPreOrder> ordersForPeriod(String period) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+
+    final endOfWeek = startOfWeek.add(const Duration(days: 7));
+
+    switch (period) {
+      case 'today':
+        return preOrders
+            .where((order) => _sameDate(order.pickupDate, today))
+            .toList();
+
+      case 'tomorrow':
+        return preOrders
+            .where((order) => _sameDate(order.pickupDate, tomorrow))
+            .toList();
+
+      case 'week':
+        return preOrders.where((order) {
+          return !order.pickupDate.isBefore(startOfWeek) &&
+              order.pickupDate.isBefore(endOfWeek);
+        }).toList();
+
+      default:
+        return List<SellerPreOrder>.from(preOrders);
+    }
+  }
+
+  Map<String, int> aggregateDemand(Iterable<SellerPreOrder> orders) {
+    final result = <String, int>{};
+
+    for (final order in orders) {
+      if (order.status == PreOrderStatus.completed) {
+        continue;
+      }
+
+      for (final item in order.items) {
+        result.update(
+          item.productName,
+          (quantity) => quantity + item.quantity,
+          ifAbsent: () => item.quantity,
+        );
+      }
+    }
+
+    return result;
+  }
+
+  void updateOrderStatus(SellerPreOrder order, PreOrderStatus status) {
+    order.status = status;
+  }
 
   List<SellerProduct> get lowStockProducts =>
       products.where((p) => p.stock <= 20).toList();

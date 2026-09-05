@@ -5,6 +5,7 @@ import '../features/auth/forgot_password_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/onboarding_screen.dart';
 import '../features/auth/register_screen.dart';
+import '../features/auth/role_selection_screen.dart';
 import '../features/auth/splash_screen.dart';
 import '../features/community/join_college_screen.dart';
 import '../features/community/join_community_screen.dart';
@@ -32,6 +33,8 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+
+  static const String roleSelection = '/role-selection';
 
   // Community
   static const String joinCommunity = '/join-community';
@@ -69,6 +72,8 @@ class AppRoutes {
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     forgotPassword: (context) => const ForgotPasswordScreen(),
+
+    roleSelection: (context) => const RoleSelectionScreen(),
 
     joinCommunity: (context) => const JoinCommunityScreen(),
     joinSupermarket: (context) => const JoinSupermarketScreen(),

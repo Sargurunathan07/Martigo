@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../app/routes.dart';
+
+import 'preorders/seller_preorders_connected_screen.dart';
+import 'demand/seller_demand_connected_screen.dart';
+
+import 'seller_mock_data.dart';
+import 'products/seller_products_connected_screen.dart';
+import 'stock/seller_stock_connected_screen.dart';
+
 class MartigoSellerColors {
   static const maroon = Color(0xFF800020);
   static const deepMaroon = Color(0xFF5A0015);
@@ -276,6 +285,8 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
   void login() {
     if (email.text.trim().toLowerCase() == 'seller@martigo.com' &&
         password.text == 'seller123') {
+      SellerDataStore.instance.activateMembership();
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const SellerDashboardShell()),
@@ -607,9 +618,9 @@ class _SellerDashboardShellState extends State<SellerDashboardShell> {
 
   final pages = const [
     SellerHomePage(),
-    SellerProductsPage(),
-    SellerPreOrdersPage(),
-    SellerStockPage(),
+    ConnectedSellerProductsPage(),
+    ConnectedSellerPreOrdersPage(),
+    ConnectedSellerStockPage(),
     SellerProfilePage(),
   ];
 
@@ -803,7 +814,8 @@ class SellerHomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const SellerDemandPlanningScreen(),
+                  builder: (_) =>
+                      const ConnectedSellerDemandScreen(period: 'week'),
                 ),
               );
             },
@@ -915,7 +927,8 @@ class SellerPreOrdersPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const SellerDemandPlanningScreen(),
+                  builder: (_) =>
+                      const ConnectedSellerDemandScreen(period: 'week'),
                 ),
               );
             },
@@ -1500,6 +1513,49 @@ class SellerNotificationsScreen extends StatelessWidget {
 class SellerProfilePage extends StatelessWidget {
   const SellerProfilePage({super.key});
 
+  Future<void> _logout(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Logout?', textAlign: TextAlign.center),
+          content: const Text(
+            'Are you sure you want to logout\n'
+            'from your Martigo seller account?',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: MartigoSellerColors.maroon,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout != true || !context.mounted) {
+      return;
+    }
+
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.roleSelection, (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -1555,6 +1611,13 @@ class SellerProfilePage extends StatelessWidget {
           const ProfileOption(
             icon: Icons.support_agent_outlined,
             title: 'Help & Support',
+          ),
+          const SizedBox(height: 12),
+          const Divider(),
+          ProfileOption(
+            icon: Icons.logout_rounded,
+            title: 'Logout',
+            onTap: () => _logout(context),
           ),
         ],
       ),
