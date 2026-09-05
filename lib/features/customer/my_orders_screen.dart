@@ -28,7 +28,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   }
 
   List<Order> _filterByTab(int index) {
-    final orders = CustomerMockData.orders;
+    final communityId = CustomerMockData.currentCommunity.id;
+
+    final orders = CustomerMockData.orders
+        .where((order) => order.communityId == communityId)
+        .toList();
     switch (index) {
       case 0:
         return orders
@@ -51,7 +55,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Orders'),
+        title: const Text('My Pre-orders'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

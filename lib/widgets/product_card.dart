@@ -19,11 +19,14 @@ class ProductCard extends StatelessWidget {
   /// Called when the card itself is tapped (e.g. to view product details).
   final VoidCallback? onTap;
 
+  final String actionLabel;
+
   const ProductCard({
     super.key,
     required this.product,
     this.onAddToPreOrder,
     this.onTap,
+    this.actionLabel = 'Add to Pre-order',
   });
 
   bool get _isAvailable =>
@@ -71,7 +74,7 @@ class ProductCard extends StatelessWidget {
                   _buildAvailabilityBadge(context),
                   const SizedBox(height: 10),
                   AppButton(
-                    label: _isAvailable ? 'Add to Pre-order' : 'Unavailable',
+                    label: _isAvailable ? actionLabel : 'Unavailable',
                     onPressed: _isAvailable ? onAddToPreOrder : null,
                     minHeight: 42,
                   ),
