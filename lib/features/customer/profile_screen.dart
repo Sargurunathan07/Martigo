@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
 import '../../core/constants/app_colors.dart';
+import 'customer_cart_store.dart';
 import 'customer_mock_data.dart';
+import 'customer_session.dart';
 
-/// Customer Profile tab.
-/// Logout is available only for the Customer section.
-/// Admin and Seller logout are handled separately.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -15,51 +14,106 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Logout?', textAlign: TextAlign.center),
-          content: const Text(
-            'Are you sure you want to logout\n'
-            'from your Martigo account?',
-            textAlign: TextAlign.center,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(true);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryMaroon,
-                foregroundColor: Colors.white,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 380),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.logout_rounded,
+                    size: 42,
+                    color: AppColors.primaryMaroon,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  const Text(
+                    'Logout?',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    'Are you sure you want to logout from your Martigo account?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black54, height: 1.4),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(false);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryMaroon,
+                        side: const BorderSide(color: AppColors.primaryMaroon),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(true);
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primaryMaroon,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text('Logout'),
+                    ),
+                  ),
+                ],
               ),
-              child: const Text('Logout'),
             ),
-          ],
+          ),
         );
       },
     );
 
-    if (shouldLogout != true || !context.mounted) {
-      return;
-    }
+    if (shouldLogout != true) return;
 
-    // Mock/local authentication for now.
-    // Real customer session/token clearing can be added here later.
+    CustomerCartStore.instance.clear();
+
+    await CustomerSession.instance.clearCommunity();
+
+    if (!context.mounted) return;
 
     Navigator.of(context)
         .pushNamedAndRemoveUntil(AppRoutes.roleSelection, (route) => false);
+  }
+
+  void _switchCommunity(BuildContext context) {
+    Navigator.of(context).pushNamed(AppRoutes.joinCommunity);
   }
 
   @override
   Widget build(BuildContext context) {
     final user = CustomerMockData.currentUser;
     final community = CustomerMockData.currentCommunity;
+
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -80,7 +134,9 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 16),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,9 +161,11 @@ class ProfileScreen extends StatelessWidget {
             ),
 
             _ProfileMenuTile(
-              icon: Icons.groups_outlined,
-              label: 'My Community',
-              onTap: () {},
+              icon: Icons.swap_horiz_rounded,
+              label: 'Switch Community',
+              onTap: () {
+                _switchCommunity(context);
+              },
             ),
 
             _ProfileMenuTile(
@@ -137,7 +195,9 @@ class ProfileScreen extends StatelessWidget {
               label: 'Logout',
               iconColor: AppColors.primaryMaroon,
               labelColor: AppColors.primaryMaroon,
-              onTap: () => _onLogoutPressed(context),
+              onTap: () {
+                _onLogoutPressed(context);
+              },
             ),
           ],
         ),

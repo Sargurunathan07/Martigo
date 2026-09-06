@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'community/seller_community_management_screen.dart';
+
 import '../../app/routes.dart';
 
 import 'preorders/seller_preorders_connected_screen.dart';
@@ -1518,32 +1520,75 @@ class SellerProfilePage extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Logout?', textAlign: TextAlign.center),
-          content: const Text(
-            'Are you sure you want to logout\n'
-            'from your Martigo seller account?',
-            textAlign: TextAlign.center,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(true);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: MartigoSellerColors.maroon,
-                foregroundColor: Colors.white,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 380),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.logout_rounded,
+                    size: 42,
+                    color: MartigoSellerColors.maroon,
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Logout?',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Are you sure you want to logout from your Martigo seller account?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black54, height: 1.4),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(false);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: MartigoSellerColors.maroon,
+                        side: const BorderSide(
+                          color: MartigoSellerColors.maroon,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(true);
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: MartigoSellerColors.maroon,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text('Logout'),
+                    ),
+                  ),
+                ],
               ),
-              child: const Text('Logout'),
             ),
-          ],
+          ),
         );
       },
     );
@@ -1587,6 +1632,18 @@ class SellerProfilePage extends StatelessWidget {
           ProfileOption(
             icon: Icons.business_outlined,
             title: 'Business Details',
+          ),
+          ProfileOption(
+            icon: Icons.groups_outlined,
+            title: 'Communities',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SellerCommunityManagementScreen(),
+                ),
+              );
+            },
           ),
           ProfileOption(
             icon: Icons.workspace_premium_outlined,

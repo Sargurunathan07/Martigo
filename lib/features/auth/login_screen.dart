@@ -87,8 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
     //
     // During mock development, every other valid login
     // is considered a Customer account.
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(AppRoutes.joinCommunity, (route) => false);
+    Navigator.of(context).pushNamed(AppRoutes.joinCommunity);
   }
 
   void _onForgotPasswordPressed() {
@@ -108,7 +107,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(
+        leading: Navigator.of(context).canPop() ? const BackButton() : null,
+        title: const Text('Login'),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -187,35 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: _openSellerPortal,
                         icon: const Icon(Icons.storefront_outlined),
                         label: const Text('Open Seller Portal'),
-                      ),
-                    ),
-
-                    const SizedBox(height: 26),
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5E1E5),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Development accounts',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF5A0015),
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text('Seller: seller@martigo.com / seller123'),
-                          SizedBox(height: 4),
-                          Text('Admin: admin@martigo.com / admin123'),
-                          SizedBox(height: 4),
-                          Text('Customer: use any other valid email/password'),
-                        ],
                       ),
                     ),
                   ],

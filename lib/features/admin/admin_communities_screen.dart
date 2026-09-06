@@ -1,123 +1,92 @@
 import 'package:flutter/material.dart';
 
-import 'admin_create_community_screen.dart';
+import '../../core/constants/app_colors.dart';
+import '../../models/community.dart';
 import '../../widgets/app_card.dart';
+import '../community/community_registry.dart';
 
-class AdminCommunitiesScreen extends StatelessWidget {
+class AdminCommunitiesScreen extends StatefulWidget {
   const AdminCommunitiesScreen({super.key});
 
-  static const List<Map<String, String>> _communities = [
-    {
-      'name': 'Sunrise Apartments',
-      'type': 'Apartment',
-      'business': 'Sunrise Supermarket',
-    },
-    {
-      'name': 'ABC Engineering College',
-      'type': 'College',
-      'business': 'ABC Campus Canteen',
-    },
-    {
-      'name': 'Lakeview Society',
-      'type': 'Apartment',
-      'business': 'Lakeview Grocers',
-    },
-    {
-      'name': 'Maple Heights',
-      'type': 'Apartment',
-      'business': 'Maple Heights Canteen',
-    },
-  ];
+  @override
+  State<AdminCommunitiesScreen> createState() => _AdminCommunitiesScreenState();
+}
 
-  void _openCreateCommunity(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AdminCreateCommunityScreen()),
-    );
+class _AdminCommunitiesScreenState extends State<AdminCommunitiesScreen> {
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    await CommunityRegistry.instance.load();
+
+    if (!mounted) return;
+
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final communities = CommunityRegistry.instance.communities;
+
+    if (loading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryMaroon),
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Communities',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF292323),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Manage apartments, colleges and their connected businesses.',
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              onPressed: () => _openCreateCommunity(context),
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Create Community'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF800020),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
+        Text(
+          'Communities',
+          style: Theme.of(context).textTheme.headlineSmall
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 6),
 
-        ..._communities.map(
+        const Text(
+          'Communities are created and managed by sellers.',
+          style: TextStyle(color: Colors.black54),
+        ),
+
+        const SizedBox(height: 22),
+
+        ...communities.map(
           (community) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 12),
             child: AppCard(
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Container(
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5E1E5),
+                    color: AppColors.softMaroon,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
-                    community['type'] == 'College'
+                    community.type == CommunityType.college
                         ? Icons.school_outlined
                         : Icons.apartment_outlined,
-                    color: const Color(0xFF800020),
+                    color: AppColors.primaryMaroon,
                   ),
                 ),
                 title: Text(
-                  community['name']!,
+                  community.name,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(
-                    '${community['type']} • ${community['business']}',
-                  ),
+                subtitle: Text(
+                  '${community.businessName ?? ''}\nCode: ${community.code}',
                 ),
-                trailing: const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFF800020),
-                ),
+                isThreeLine: true,
               ),
             ),
           ),
