@@ -6,7 +6,9 @@ import '../seller_mock_data.dart';
 import '../seller_models.dart';
 
 class ConnectedSellerProductsPage extends StatefulWidget {
-  const ConnectedSellerProductsPage({super.key});
+  final bool isCanteen;
+
+  const ConnectedSellerProductsPage({super.key, this.isCanteen = false});
 
   @override
   State<ConnectedSellerProductsPage> createState() =>
@@ -19,14 +21,17 @@ class _ConnectedSellerProductsPageState
 
   String search = '';
 
+  List<SellerProduct> get modeProducts =>
+      store.productsForMode(widget.isCanteen);
+
   List<SellerProduct> get filteredProducts {
     final query = search.trim().toLowerCase();
 
     if (query.isEmpty) {
-      return store.products;
+      return modeProducts;
     }
 
-    return store.products.where((product) {
+    return modeProducts.where((product) {
       return product.name.toLowerCase().contains(query) ||
           product.category.toLowerCase().contains(query);
     }).toList();
@@ -34,26 +39,41 @@ class _ConnectedSellerProductsPageState
 
   Future<void> _addProduct() async {
     final product = await Navigator.of(context).push<SellerProduct>(
-      MaterialPageRoute(builder: (_) => const SellerProductFormScreen()),
+      MaterialPageRoute(
+        builder: (_) => SellerProductFormScreen(isCanteen: widget.isCanteen),
+      ),
     );
 
-    if (product == null) return;
+    if (product == null) {
+      return;
+    }
 
     setState(() {
-      store.products.add(product);
+      modeProducts.add(product);
     });
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Product added successfully')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          widget.isCanteen
+              ? 'Food item added successfully'
+              : 'Product added successfully',
+        ),
+      ),
+    );
   }
 
   Future<void> _editProduct(SellerProduct product) async {
     final updated = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => SellerProductFormScreen(product: product),
+        builder: (_) => SellerProductFormScreen(
+          product: product,
+          isCanteen: widget.isCanteen,
+        ),
       ),
     );
 
@@ -63,12 +83,14 @@ class _ConnectedSellerProductsPageState
   }
 
   Future<void> _deleteProduct(SellerProduct product) async {
+    final itemName = widget.isCanteen ? 'Food Item' : 'Product';
+
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete Product?'),
-          content: Text('Remove ${product.name} from your Martigo store?'),
+          title: Text('Delete $itemName?'),
+          content: Text('Remove ${product.name}?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -90,10 +112,12 @@ class _ConnectedSellerProductsPageState
       },
     );
 
-    if (shouldDelete != true) return;
+    if (shouldDelete != true) {
+      return;
+    }
 
     setState(() {
-      store.products.removeWhere((item) => item.id == product.id);
+      modeProducts.removeWhere((item) => item.id == product.id);
     });
   }
 
@@ -107,6 +131,10 @@ class _ConnectedSellerProductsPageState
   Widget build(BuildContext context) {
     final products = filteredProducts;
 
+    final title = widget.isCanteen ? 'Menu' : 'Products';
+
+    final addLabel = widget.isCanteen ? 'Add Food Item' : 'Add Product';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButton: FloatingActionButton.extended(
@@ -114,23 +142,29 @@ class _ConnectedSellerProductsPageState
         backgroundColor: AppColors.primaryMaroon,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Add Product'),
+        label: Text(addLabel),
       ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Text(
-              'Products',
+              title,
               style: Theme.of(context).textTheme.headlineSmall
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 6),
-            const Text(
-              'Manage products, prices, stock and pre-order availability.',
-              style: TextStyle(color: Colors.black54),
+
+            Text(
+              widget.isCanteen
+                  ? 'Manage breakfast, lunch, snacks, drinks and pre-order availability.'
+                  : 'Manage products, prices, stock and pre-order availability.',
+              style: const TextStyle(color: Colors.black54),
             ),
+
             const SizedBox(height: 20),
+
             TextField(
               onChanged: (value) {
                 setState(() {
@@ -138,7 +172,7 @@ class _ConnectedSellerProductsPageState
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search products',
+                hintText: widget.isCanteen ? 'Search menu' : 'Search products',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: AppColors.cream,
@@ -148,11 +182,19 @@ class _ConnectedSellerProductsPageState
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
+
             if (products.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: Text('No products found.')),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 60),
+                child: Center(
+                  child: Text(
+                    widget.isCanteen
+                        ? 'No food items found.'
+                        : 'No products found.',
+                  ),
+                ),
               )
             else
               ...products.map(
@@ -168,12 +210,16 @@ class _ConnectedSellerProductsPageState
                             color: AppColors.softMaroon,
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(
-                            Icons.inventory_2_outlined,
+                          child: Icon(
+                            widget.isCanteen
+                                ? Icons.restaurant_menu_rounded
+                                : Icons.inventory_2_outlined,
                             color: AppColors.primaryMaroon,
                           ),
                         ),
+
                         const SizedBox(width: 14),
+
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,61 +233,49 @@ class _ConnectedSellerProductsPageState
                               Text('${product.category} • ${product.unit}'),
                               const SizedBox(height: 4),
                               Text(
-                                '₹${product.price.toStringAsFixed(2)} • Stock: ${product.stock}',
+                                widget.isCanteen
+                                    ? '₹${product.price.toStringAsFixed(2)} • Available: ${product.stock}'
+                                    : '₹${product.price.toStringAsFixed(2)} • Stock: ${product.stock}',
                                 style: const TextStyle(
                                   color: AppColors.primaryMaroon,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Icon(
-                                    product.preOrderEnabled
-                                        ? Icons.check_circle_outline
-                                        : Icons.cancel_outlined,
-                                    size: 17,
-                                    color: product.preOrderEnabled
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    product.preOrderEnabled
-                                        ? 'Pre-order ON'
-                                        : 'Pre-order OFF',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: product.preOrderEnabled
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 5),
+                              Text(
+                                product.preOrderEnabled
+                                    ? 'Pre-order ON'
+                                    : 'Pre-order OFF',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: product.preOrderEnabled
+                                      ? AppColors.primaryMaroon
+                                      : Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
                         ),
+
                         PopupMenuButton<String>(
                           onSelected: (value) {
-                            switch (value) {
-                              case 'edit':
-                                _editProduct(product);
-                                break;
-
-                              case 'toggle':
-                                _togglePreOrder(product);
-                                break;
-
-                              case 'delete':
-                                _deleteProduct(product);
-                                break;
+                            if (value == 'edit') {
+                              _editProduct(product);
+                            } else if (value == 'toggle') {
+                              _togglePreOrder(product);
+                            } else if (value == 'delete') {
+                              _deleteProduct(product);
                             }
                           },
                           itemBuilder: (_) => [
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'edit',
-                              child: Text('Edit Product'),
+                              child: Text(
+                                widget.isCanteen
+                                    ? 'Edit Food Item'
+                                    : 'Edit Product',
+                              ),
                             ),
                             PopupMenuItem(
                               value: 'toggle',
@@ -251,9 +285,13 @@ class _ConnectedSellerProductsPageState
                                     : 'Enable Pre-order',
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'delete',
-                              child: Text('Delete Product'),
+                              child: Text(
+                                widget.isCanteen
+                                    ? 'Delete Food Item'
+                                    : 'Delete Product',
+                              ),
                             ),
                           ],
                         ),
@@ -262,6 +300,7 @@ class _ConnectedSellerProductsPageState
                   ),
                 ),
               ),
+
             const SizedBox(height: 90),
           ],
         ),
@@ -272,8 +311,13 @@ class _ConnectedSellerProductsPageState
 
 class SellerProductFormScreen extends StatefulWidget {
   final SellerProduct? product;
+  final bool isCanteen;
 
-  const SellerProductFormScreen({super.key, this.product});
+  const SellerProductFormScreen({
+    super.key,
+    this.product,
+    this.isCanteen = false,
+  });
 
   @override
   State<SellerProductFormScreen> createState() =>
@@ -284,8 +328,11 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
   final formKey = GlobalKey<FormState>();
 
   late final TextEditingController nameController;
+
   late final TextEditingController priceController;
+
   late final TextEditingController unitController;
+
   late final TextEditingController stockController;
 
   late String category;
@@ -293,16 +340,20 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
 
   bool get editing => widget.product != null;
 
-  final categories = const [
-    'Dairy',
-    'Bakery',
-    'Groceries',
-    'Vegetables',
-    'Snacks',
-    'Beverages',
-    'Meals',
-    'Drinks',
-  ];
+  List<String> get categories {
+    if (widget.isCanteen) {
+      return const ['Breakfast', 'Lunch', 'Evening Snacks', 'Drinks'];
+    }
+
+    return const [
+      'Dairy',
+      'Bakery',
+      'Groceries',
+      'Vegetables',
+      'Snacks',
+      'Beverages',
+    ];
+  }
 
   @override
   void initState() {
@@ -322,10 +373,10 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
       text: product?.stock.toString() ?? '',
     );
 
-    category = product?.category ?? 'Dairy';
+    category = product?.category ?? (widget.isCanteen ? 'Breakfast' : 'Dairy');
 
     if (!categories.contains(category)) {
-      category = 'Groceries';
+      category = categories.first;
     }
 
     preOrderEnabled = product?.preOrderEnabled ?? true;
@@ -348,13 +399,13 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
 
     final price = double.tryParse(priceController.text.trim());
 
-    final stock = int.tryParse(stockController.text.trim());
+    final quantity = int.tryParse(stockController.text.trim());
 
     if (price == null || price < 0) {
       return;
     }
 
-    if (stock == null || stock < 0) {
+    if (quantity == null || quantity < 0) {
       return;
     }
 
@@ -365,7 +416,7 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
       product.category = category;
       product.price = price;
       product.unit = unitController.text.trim();
-      product.stock = stock;
+      product.stock = quantity;
       product.preOrderEnabled = preOrderEnabled;
 
       Navigator.of(context).pop(true);
@@ -379,7 +430,7 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
       category: category,
       price: price,
       unit: unitController.text.trim(),
-      stock: stock,
+      stock: quantity,
       preOrderEnabled: preOrderEnabled,
     );
 
@@ -388,9 +439,14 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final item = widget.isCanteen ? 'Food Item' : 'Product';
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(editing ? 'Edit Product' : 'Add Product')),
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: Text(editing ? 'Edit $item' : 'Add $item'),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -402,19 +458,29 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                 children: [
                   TextFormField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Product Name',
-                      prefixIcon: Icon(Icons.inventory_2_outlined),
+                    decoration: InputDecoration(
+                      labelText: widget.isCanteen
+                          ? 'Food Name'
+                          : 'Product Name',
+                      prefixIcon: Icon(
+                        widget.isCanteen
+                            ? Icons.restaurant_outlined
+                            : Icons.inventory_2_outlined,
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter product name';
+                        return widget.isCanteen
+                            ? 'Please enter food name'
+                            : 'Please enter product name';
                       }
 
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
                   DropdownButtonFormField<String>(
                     initialValue: category,
                     decoration: const InputDecoration(
@@ -437,7 +503,9 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                       });
                     },
                   ),
+
                   const SizedBox(height: 16),
+
                   TextFormField(
                     controller: priceController,
                     keyboardType: const TextInputType.numberWithOptions(
@@ -457,12 +525,16 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
                   TextFormField(
                     controller: unitController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Unit',
-                      hintText: '1 L, 500 g, piece...',
+                      hintText: widget.isCanteen
+                          ? 'plate, cup, piece...'
+                          : '1 L, 500 g, piece...',
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -472,25 +544,35 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 16),
+
                   TextFormField(
                     controller: stockController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Available Stock',
-                      prefixIcon: Icon(Icons.inventory_outlined),
+                    decoration: InputDecoration(
+                      labelText: widget.isCanteen
+                          ? 'Available Quantity'
+                          : 'Available Stock',
+                      prefixIcon: Icon(
+                        widget.isCanteen
+                            ? Icons.room_service_outlined
+                            : Icons.inventory_outlined,
+                      ),
                     ),
                     validator: (value) {
-                      final stock = int.tryParse(value ?? '');
+                      final quantity = int.tryParse(value ?? '');
 
-                      if (stock == null || stock < 0) {
-                        return 'Enter valid stock';
+                      if (quantity == null || quantity < 0) {
+                        return 'Enter a valid quantity';
                       }
 
                       return null;
                     },
                   ),
+
                   const SizedBox(height: 14),
+
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     value: preOrderEnabled,
@@ -498,8 +580,8 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                     title: const Text('Available for Pre-order'),
                     subtitle: Text(
                       preOrderEnabled
-                          ? 'Customers can pre-order this product.'
-                          : 'This product will not accept pre-orders.',
+                          ? 'Customers can pre-order this item.'
+                          : 'Pre-orders are disabled for this item.',
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -507,7 +589,9 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                       });
                     },
                   ),
+
                   const SizedBox(height: 28),
+
                   FilledButton.icon(
                     onPressed: _save,
                     icon: const Icon(Icons.save_outlined),
@@ -516,7 +600,7 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(54),
                     ),
-                    label: Text(editing ? 'Save Changes' : 'Add Product'),
+                    label: Text(editing ? 'Save Changes' : 'Add $item'),
                   ),
                 ],
               ),

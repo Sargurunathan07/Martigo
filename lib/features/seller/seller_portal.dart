@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'community/seller_community_management_screen.dart';
 
 import '../../app/routes.dart';
+import '../../models/community.dart';
+
+import 'community/seller_community_session.dart';
+import 'dashboard/seller_dynamic_home_screen.dart';
 
 import 'preorders/seller_preorders_connected_screen.dart';
 import 'demand/seller_demand_connected_screen.dart';
@@ -618,56 +622,84 @@ class SellerDashboardShell extends StatefulWidget {
 class _SellerDashboardShellState extends State<SellerDashboardShell> {
   int index = 0;
 
-  final pages = const [
-    SellerHomePage(),
-    ConnectedSellerProductsPage(),
-    ConnectedSellerPreOrdersPage(),
-    ConnectedSellerStockPage(),
-    SellerProfilePage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    SellerCommunitySession.instance.load();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: pages[index],
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: (value) {
-          setState(() => index = value);
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
+    return ValueListenableBuilder<Community?>(
+      valueListenable: SellerCommunitySession.instance.activeCommunity,
+      builder: (context, community, _) {
+        final isCanteen = community?.businessType == BusinessType.canteen;
+
+        final pages = <Widget>[
+          SellerDynamicHomeScreen(community: community, isCanteen: isCanteen),
+          ConnectedSellerProductsPage(isCanteen: isCanteen),
+          const ConnectedSellerPreOrdersPage(),
+          ConnectedSellerStockPage(isCanteen: isCanteen),
+          const SellerProfilePage(),
+        ];
+
+        return Scaffold(
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: pages[index],
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2_rounded),
-            label: 'Products',
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: index,
+            onDestinationSelected: (value) {
+              setState(() {
+                index = value;
+              });
+            },
+            destinations: [
+              const NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home_rounded),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(
+                  isCanteen
+                      ? Icons.restaurant_menu_outlined
+                      : Icons.inventory_2_outlined,
+                ),
+                selectedIcon: Icon(
+                  isCanteen ? Icons.restaurant_menu : Icons.inventory_2_rounded,
+                ),
+                label: isCanteen ? 'Menu' : 'Products',
+              ),
+              const NavigationDestination(
+                icon: Icon(Icons.event_note_outlined),
+                selectedIcon: Icon(Icons.event_note_rounded),
+                label: 'Pre-orders',
+              ),
+              NavigationDestination(
+                icon: Icon(
+                  isCanteen
+                      ? Icons.room_service_outlined
+                      : Icons.inventory_outlined,
+                ),
+                selectedIcon: Icon(
+                  isCanteen ? Icons.room_service : Icons.inventory_rounded,
+                ),
+                label: isCanteen ? 'Availability' : 'Stock',
+              ),
+              const NavigationDestination(
+                icon: Icon(Icons.person_outline),
+                selectedIcon: Icon(Icons.person_rounded),
+                label: 'Profile',
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            selectedIcon: Icon(Icons.event_note_rounded),
-            label: 'Pre-orders',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.inventory_outlined),
-            selectedIcon: Icon(Icons.inventory_rounded),
-            label: 'Stock',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

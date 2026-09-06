@@ -70,6 +70,67 @@ class SellerDataStore {
     ),
   ];
 
+  final List<SellerProduct> canteenProducts = [
+    SellerProduct(
+      id: 'cf001',
+      name: 'Idli',
+      category: 'Breakfast',
+      price: 20,
+      unit: 'plate',
+      stock: 40,
+    ),
+    SellerProduct(
+      id: 'cf002',
+      name: 'Dosa',
+      category: 'Breakfast',
+      price: 35,
+      unit: 'plate',
+      stock: 30,
+    ),
+    SellerProduct(
+      id: 'cf003',
+      name: 'Veg Meals',
+      category: 'Lunch',
+      price: 80,
+      unit: 'plate',
+      stock: 60,
+    ),
+    SellerProduct(
+      id: 'cf004',
+      name: 'Lemon Rice',
+      category: 'Lunch',
+      price: 50,
+      unit: 'plate',
+      stock: 35,
+    ),
+    SellerProduct(
+      id: 'cf005',
+      name: 'Samosa',
+      category: 'Evening Snacks',
+      price: 15,
+      unit: 'piece',
+      stock: 50,
+    ),
+    SellerProduct(
+      id: 'cf006',
+      name: 'Tea',
+      category: 'Drinks',
+      price: 12,
+      unit: 'cup',
+      stock: 70,
+    ),
+  ];
+
+  List<SellerProduct> productsForMode(bool isCanteen) {
+    return isCanteen ? canteenProducts : products;
+  }
+
+  List<SellerProduct> lowAvailabilityForMode(bool isCanteen) {
+    return productsForMode(isCanteen)
+        .where((product) => product.stock <= 20)
+        .toList();
+  }
+
   final List<SellerPreOrder> preOrders = [
     SellerPreOrder(
       id: 'MRT1024',

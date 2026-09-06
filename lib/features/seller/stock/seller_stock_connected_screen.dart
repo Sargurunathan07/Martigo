@@ -6,7 +6,9 @@ import '../seller_mock_data.dart';
 import '../seller_models.dart';
 
 class ConnectedSellerStockPage extends StatefulWidget {
-  const ConnectedSellerStockPage({super.key});
+  final bool isCanteen;
+
+  const ConnectedSellerStockPage({super.key, this.isCanteen = false});
 
   @override
   State<ConnectedSellerStockPage> createState() =>
@@ -23,7 +25,9 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
   }
 
   void _decrease(SellerProduct product) {
-    if (product.stock <= 0) return;
+    if (product.stock <= 0) {
+      return;
+    }
 
     setState(() {
       product.stock--;
@@ -32,9 +36,9 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
 
   @override
   Widget build(BuildContext context) {
-    final products = store.products;
+    final products = store.productsForMode(widget.isCanteen);
 
-    final lowStock = store.lowStockProducts;
+    final low = store.lowAvailabilityForMode(widget.isCanteen);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -43,16 +47,22 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
           padding: const EdgeInsets.all(20),
           children: [
             Text(
-              'Stock Management',
+              widget.isCanteen ? 'Menu Availability' : 'Stock Management',
               style: Theme.of(context).textTheme.headlineSmall
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 6),
-            const Text(
-              'Update stock levels for all your products.',
-              style: TextStyle(color: Colors.black54),
+
+            Text(
+              widget.isCanteen
+                  ? 'Update how many portions are available for each menu item.'
+                  : 'Update stock levels for all your products.',
+              style: const TextStyle(color: Colors.black54),
             ),
+
             const SizedBox(height: 20),
+
             AppCard(
               child: Row(
                 children: [
@@ -63,13 +73,17 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '${lowStock.length} product(s) currently have low stock.',
+                      widget.isCanteen
+                          ? '${low.length} menu item(s) have low availability.'
+                          : '${low.length} product(s) currently have low stock.',
                     ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 22),
+
             ...products.map(
               (product) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -86,13 +100,15 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
-                          product.stock <= 20
-                              ? Icons.warning_amber_rounded
+                          widget.isCanteen
+                              ? Icons.restaurant_menu
                               : Icons.inventory_2_outlined,
                           color: AppColors.primaryMaroon,
                         ),
                       ),
+
                       const SizedBox(width: 14),
+
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,24 +122,30 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
                             Text('${product.category} • ${product.unit}'),
                             const SizedBox(height: 4),
                             Text(
-                              product.stock <= 20 ? 'LOW STOCK' : 'In Stock',
-                              style: TextStyle(
+                              widget.isCanteen
+                                  ? product.stock <= 20
+                                        ? 'LOW AVAILABILITY'
+                                        : 'Available'
+                                  : product.stock <= 20
+                                  ? 'LOW STOCK'
+                                  : 'In Stock',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: product.stock <= 20
-                                    ? AppColors.primaryMaroon
-                                    : Colors.green,
+                                color: AppColors.primaryMaroon,
                               ),
                             ),
                           ],
                         ),
                       ),
+
                       IconButton(
                         onPressed: () {
                           _decrease(product);
                         },
                         icon: const Icon(Icons.remove_circle_outline),
                       ),
+
                       SizedBox(
                         width: 38,
                         child: Text(
@@ -133,6 +155,7 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
+
                       IconButton(
                         onPressed: () {
                           _increase(product);

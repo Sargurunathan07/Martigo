@@ -6,6 +6,7 @@ import '../../../models/community.dart';
 import '../../../widgets/app_card.dart';
 import '../../community/community_registry.dart';
 import '../seller_mock_data.dart';
+import 'seller_community_session.dart';
 
 class SellerCommunityManagementScreen extends StatefulWidget {
   const SellerCommunityManagementScreen({super.key});
@@ -28,11 +29,25 @@ class _SellerCommunityManagementScreenState
   Future<void> _load() async {
     await CommunityRegistry.instance.load();
 
+    await SellerCommunitySession.instance.load();
+
     if (!mounted) return;
 
     setState(() {
       loading = false;
     });
+  }
+
+  Future<void> _selectCommunity(Community community) async {
+    await SellerCommunitySession.instance.setActiveCommunity(community);
+
+    if (!mounted) return;
+
+    setState(() {});
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('${community.name} is now active')));
   }
 
   Future<void> _create() async {
@@ -49,6 +64,8 @@ class _SellerCommunityManagementScreenState
   Widget build(BuildContext context) {
     final communities = CommunityRegistry.instance.communities;
 
+    final active = SellerCommunitySession.instance.current;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -59,7 +76,7 @@ class _SellerCommunityManagementScreenState
         onPressed: _create,
         backgroundColor: AppColors.primaryMaroon,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
+        icon: const Icon(Icons.add),
         label: const Text('Create Community'),
       ),
       body: loading
@@ -70,7 +87,7 @@ class _SellerCommunityManagementScreenState
               padding: const EdgeInsets.all(20),
               children: [
                 const Text(
-                  'Create a community and share its code with customers.',
+                  'Create communities and choose which one you are currently managing.',
                   style: TextStyle(color: Colors.black54),
                 ),
 
@@ -79,44 +96,92 @@ class _SellerCommunityManagementScreenState
                 if (communities.isEmpty)
                   const AppCard(
                     child: Padding(
-                      padding: EdgeInsets.all(18),
+                      padding: EdgeInsets.all(20),
                       child: Text(
-                        'No communities yet.\nCreate one to start your demo.',
+                        'No communities yet.\nCreate one to start.',
                         textAlign: TextAlign.center,
                       ),
                     ),
                   )
                 else
-                  ...communities.map(
-                    (community) => Padding(
+                  ...communities.map((community) {
+                    final isActive = active?.code == community.code;
+
+                    final isCanteen =
+                        community.businessType == BusinessType.canteen;
+
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: AppCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              community.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                Icon(
+                                  isCanteen
+                                      ? Icons.restaurant
+                                      : Icons.storefront,
+                                  color: AppColors.primaryMaroon,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    community.name,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                if (isActive)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.softMaroon,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Text(
+                                      'ACTIVE',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.primaryMaroon,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                            const SizedBox(height: 5),
+
+                            const SizedBox(height: 8),
+
                             Text(community.businessName ?? ''),
-                            const SizedBox(height: 14),
+
+                            Text(
+                              isCanteen
+                                  ? 'College / Canteen'
+                                  : 'Apartment / Supermarket',
+                              style: const TextStyle(color: Colors.black54),
+                            ),
+
+                            const SizedBox(height: 12),
+
                             Row(
                               children: [
                                 Expanded(
                                   child: Text(
-                                    community.code,
+                                    'Code: ${community.code}',
                                     style: const TextStyle(
-                                      fontSize: 18,
                                       color: AppColors.primaryMaroon,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 IconButton(
+                                  tooltip: 'Copy code',
                                   onPressed: () {
                                     Clipboard.setData(
                                       ClipboardData(text: community.code),
@@ -126,11 +191,24 @@ class _SellerCommunityManagementScreenState
                                 ),
                               ],
                             ),
+
+                            if (!isActive) ...[
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    _selectCommunity(community);
+                                  },
+                                  child: const Text('Manage This Community'),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
 
                 const SizedBox(height: 80),
               ],
@@ -172,6 +250,7 @@ class _SellerCreateCommunityScreenState
   void dispose() {
     communityController.dispose();
     businessController.dispose();
+
     super.dispose();
   }
 
@@ -190,6 +269,8 @@ class _SellerCreateCommunityScreenState
       type: type,
     );
 
+    await SellerCommunitySession.instance.setActiveCommunity(community);
+
     if (!mounted) return;
 
     setState(() {
@@ -205,7 +286,18 @@ class _SellerCreateCommunityScreenState
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(community.name),
+              Icon(
+                type == CommunityType.college
+                    ? Icons.restaurant
+                    : Icons.storefront,
+                size: 46,
+                color: AppColors.primaryMaroon,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                community.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 14),
               const Text('Share this code with customers:'),
               const SizedBox(height: 8),
@@ -216,6 +308,13 @@ class _SellerCreateCommunityScreenState
                   color: AppColors.primaryMaroon,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                type == CommunityType.college
+                    ? 'Canteen mode is now active.'
+                    : 'Supermarket mode is now active.',
+                style: const TextStyle(color: Colors.black54),
               ),
             ],
           ),
@@ -238,6 +337,8 @@ class _SellerCreateCommunityScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isCollege = type == CommunityType.college;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -269,7 +370,9 @@ class _SellerCreateCommunityScreenState
                       ),
                     ],
                     onChanged: (value) {
-                      if (value == null) return;
+                      if (value == null) {
+                        return;
+                      }
 
                       setState(() {
                         type = value;
@@ -281,9 +384,11 @@ class _SellerCreateCommunityScreenState
 
                   TextFormField(
                     controller: communityController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Community Name',
-                      hintText: 'Sunrise Apartments',
+                      hintText: isCollege
+                          ? 'ABC Engineering College'
+                          : 'Sunrise Apartments',
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -298,12 +403,19 @@ class _SellerCreateCommunityScreenState
 
                   TextFormField(
                     controller: businessController,
-                    decoration: const InputDecoration(
-                      labelText: 'Business / Store Name',
+                    decoration: InputDecoration(
+                      labelText: isCollege
+                          ? 'Canteen Name'
+                          : 'Supermarket Name',
+                      hintText: isCollege
+                          ? 'ABC College Canteen'
+                          : 'Sunrise Supermarket',
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter business name';
+                        return isCollege
+                            ? 'Enter canteen name'
+                            : 'Enter supermarket name';
                       }
 
                       return null;
@@ -319,7 +431,16 @@ class _SellerCreateCommunityScreenState
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(54),
                     ),
-                    child: const Text('Create Community'),
+                    child: saving
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Create Community'),
                   ),
                 ],
               ),
