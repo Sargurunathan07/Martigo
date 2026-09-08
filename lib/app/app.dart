@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../features/common/not_found_screen.dart';
+
 import 'routes.dart';
 import 'theme.dart';
 
@@ -15,6 +17,9 @@ class App extends StatelessWidget {
       theme: AppTheme.light,
       initialRoute: AppRoutes.initial,
       routes: AppRoutes.routes,
+      onUnknownRoute: (_) {
+        return MaterialPageRoute(builder: (_) => const NotFoundScreen());
+      },
     );
   }
 }

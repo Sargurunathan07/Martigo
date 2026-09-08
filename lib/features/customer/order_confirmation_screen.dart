@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/pre_order_cutoff.dart';
 import '../../models/order.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_card.dart';
@@ -19,10 +20,77 @@ class OrderConfirmationScreen extends StatefulWidget {
 class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   bool _submitting = false;
 
+  Future<void> _showInvalidDateDialog(DateTime selectedDate) async {
+    final earliest = PreOrderCutoff.earliestAvailableDate();
+
+    final tomorrowClosed =
+        PreOrderCutoff.isTomorrow(selectedDate) &&
+        PreOrderCutoff.isTomorrowCutoffClosed();
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          icon: const Icon(
+            Icons.schedule_rounded,
+            size: 48,
+            color: AppColors.primaryMaroon,
+          ),
+          title: Text(
+            tomorrowClosed
+                ? 'Pre-order cutoff has ended.'
+                : 'Selected date is unavailable.',
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            tomorrowClosed
+                ? 'Orders for '
+                      '${PreOrderCutoff.formatLongDate(selectedDate)} '
+                      'are now closed. Please select '
+                      '${PreOrderCutoff.formatLongDate(earliest)} '
+                      'or a later date.'
+                : 'Please select '
+                      '${PreOrderCutoff.formatLongDate(earliest)} '
+                      'or a later date.',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Select another date'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _confirmOrder() async {
     final store = CustomerCartStore.instance;
 
     if (store.isEmpty || store.pickupDate == null || store.pickupSlot == null) {
+      return;
+    }
+
+    final selectedDate = store.pickupDate!;
+
+    // CRITICAL:
+    // Recalculate India date/time at the exact moment
+    // the customer presses Confirm Pre-order.
+    if (!PreOrderCutoff.isDateAvailable(selectedDate)) {
+      await _showInvalidDateDialog(selectedDate);
+
+      if (!mounted) {
+        return;
+      }
+
+      // Return to the EXISTING date-selection screen.
+      Navigator.of(context).pop('cutoffExpired');
+
       return;
     }
 
@@ -31,6 +99,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
     });
 
     await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) {
+      return;
+    }
 
     final community = CustomerMockData.currentCommunity;
 
@@ -49,9 +121,13 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
           .toList(),
       total: store.total,
       communityId: community.id,
-      preOrderDate: store.pickupDate!,
+
+      // Existing Order model already stores this.
+      preOrderDate: selectedDate,
+
       pickupLocation:
-          '${community.businessName ?? community.name} • ${store.pickupSlot}',
+          '${community.businessName ?? community.name} '
+          '• ${store.pickupSlot}',
       status: OrderStatus.confirmed,
     );
 
@@ -59,7 +135,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
     store.clear();
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     await showDialog<void>(
       context: context,
@@ -72,11 +150,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             color: AppColors.primaryMaroon,
           ),
           title: const Text(
-            'Pre-order Confirmed!',
+            'Pre-order confirmed successfully!',
             textAlign: TextAlign.center,
           ),
           content: const Text(
-            'Your pre-order has been added successfully.',
+            'Your pre-order has been added to My Pre-orders.',
             textAlign: TextAlign.center,
           ),
           actionsAlignment: MainAxisAlignment.center,
@@ -92,7 +170,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
       },
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.customerHome,
@@ -104,6 +184,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     final store = CustomerCartStore.instance;
+
     final community = CustomerMockData.currentCommunity;
 
     return Scaffold(
@@ -119,7 +200,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                   community.businessName ?? community.name,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
+
                 const SizedBox(height: 18),
+
                 ...store.items.map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -128,7 +211,8 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              '${item.product.name} × ${item.quantity}',
+                              '${item.product.name} '
+                              '× ${item.quantity}',
                             ),
                           ),
                           Text('₹${item.subtotal.toStringAsFixed(2)}'),
@@ -137,7 +221,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 10),
+
                 AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,23 +232,33 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                         'Pickup Date',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
+
                       const SizedBox(height: 4),
+
                       Text(
                         store.pickupDate == null
                             ? '-'
-                            : '${store.pickupDate!.day}/${store.pickupDate!.month}/${store.pickupDate!.year}',
+                            : '${store.pickupDate!.day}/'
+                                  '${store.pickupDate!.month}/'
+                                  '${store.pickupDate!.year}',
                       ),
+
                       const SizedBox(height: 14),
+
                       Text(
                         'Pickup Time',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
+
                       const SizedBox(height: 4),
+
                       Text(store.pickupSlot ?? '-'),
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 18),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -179,9 +275,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 28),
+
                 AppButton(
-                  label: 'Confirm Order',
+                  label: 'Confirm Pre-order',
                   isLoading: _submitting,
                   onPressed: store.isEmpty ? null : _confirmOrder,
                 ),
