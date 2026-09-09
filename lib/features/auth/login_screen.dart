@@ -184,10 +184,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 8),
 
-                    Center(
-                      child: TextButton.icon(
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Are you a seller?',
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton.icon(
                         onPressed: _openSellerPortal,
-                        icon: const Icon(Icons.storefront_outlined),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .secondary,
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .onSecondary,
+                          textStyle: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        icon: const Icon(Icons.storefront_rounded, size: 24),
                         label: const Text('Open Seller Portal'),
                       ),
                     ),
