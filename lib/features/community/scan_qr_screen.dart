@@ -43,10 +43,10 @@ class ScanQrScreen extends StatelessWidget {
                     width: 280,
                     height: 280,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF7F0),
+                      color: const Color(0xFFF5DCE4),
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: const Color(0xFF800020),
+                        color: const Color(0xFF7A1736),
                         width: 3,
                       ),
                     ),
@@ -54,7 +54,7 @@ class ScanQrScreen extends StatelessWidget {
                       child: Icon(
                         Icons.qr_code_scanner_rounded,
                         size: 120,
-                        color: Color(0xFF800020),
+                        color: Color(0xFF7A1736),
                       ),
                     ),
                   ),
@@ -72,7 +72,7 @@ class ScanQrScreen extends StatelessWidget {
                       icon: const Icon(Icons.play_arrow_rounded),
                       label: const Text('Use Demo QR'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF800020),
+                        backgroundColor: const Color(0xFF7A1736),
                         foregroundColor: Colors.white,
                       ),
                     ),

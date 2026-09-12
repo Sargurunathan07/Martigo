@@ -5,11 +5,11 @@ class AppTheme {
   AppTheme._();
 
   // Brand palette
-  static const Color primaryMaroon = Color(0xFF800020);
-  static const Color deepMaroon = Color(0xFF5A0015);
-  static const Color softMaroon = Color(0xFFF5E1E5);
-  static const Color cream = Color(0xFFFFF7F0);
-  static const Color backgroundColor = Color(0xFFFFFDFC);
+  static const Color primaryMaroon = Color(0xFF7A1736);
+  static const Color deepMaroon = Color(0xFF5A0018);
+  static const Color softMaroon = Color(0xFFD99AAF);
+  static const Color cream = Color(0xFFF5DCE4);
+  static const Color backgroundColor = Color(0xFFFFFFFF);
   static const Color textColor = Color(0xFF292323);
 
   static const double _radius = 16;

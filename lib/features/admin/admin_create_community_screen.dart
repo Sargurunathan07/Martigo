@@ -139,7 +139,7 @@ class _AdminCreateCommunityScreenState
                         hintText: 'Sunrise Apartments',
                         prefixIcon: const Icon(Icons.groups_rounded),
                         filled: true,
-                        fillColor: const Color(0xFFFFF7F0),
+                        fillColor: const Color(0xFFF5DCE4),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -161,7 +161,7 @@ class _AdminCreateCommunityScreenState
                         labelText: 'Community Type',
                         prefixIcon: const Icon(Icons.category_outlined),
                         filled: true,
-                        fillColor: const Color(0xFFFFF7F0),
+                        fillColor: const Color(0xFFF5DCE4),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -204,7 +204,7 @@ class _AdminCreateCommunityScreenState
                               : Icons.restaurant_rounded,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFFFF7F0),
+                        fillColor: const Color(0xFFF5DCE4),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -223,14 +223,14 @@ class _AdminCreateCommunityScreenState
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5E1E5),
+                        color: const Color(0xFFD99AAF),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.business_center_outlined,
-                            color: Color(0xFF800020),
+                            color: Color(0xFF7A1736),
                           ),
                           const SizedBox(width: 14),
                           Column(
@@ -266,8 +266,8 @@ class _AdminCreateCommunityScreenState
                       label: const Text('Generate Community Code'),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(54),
-                        foregroundColor: const Color(0xFF800020),
-                        side: const BorderSide(color: Color(0xFF800020)),
+                        foregroundColor: const Color(0xFF7A1736),
+                        side: const BorderSide(color: Color(0xFF7A1736)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -280,10 +280,10 @@ class _AdminCreateCommunityScreenState
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5E1E5),
+                          color: const Color(0xFFD99AAF),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF800020)
+                            color: const Color(0xFF7A1736)
                                 .withValues(alpha: 0.20),
                           ),
                         ),
@@ -292,7 +292,7 @@ class _AdminCreateCommunityScreenState
                             const Icon(
                               Icons.verified_rounded,
                               size: 44,
-                              color: Color(0xFF800020),
+                              color: Color(0xFF7A1736),
                             ),
                             const SizedBox(height: 14),
                             const Text(
@@ -306,7 +306,7 @@ class _AdminCreateCommunityScreenState
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
-                                color: Color(0xFF5A0015),
+                                color: Color(0xFF5A0018),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -315,7 +315,7 @@ class _AdminCreateCommunityScreenState
                               icon: const Icon(Icons.copy_rounded),
                               label: const Text('Copy Code'),
                               style: TextButton.styleFrom(
-                                foregroundColor: const Color(0xFF800020),
+                                foregroundColor: const Color(0xFF7A1736),
                               ),
                             ),
                           ],
@@ -327,7 +327,7 @@ class _AdminCreateCommunityScreenState
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF7F0),
+                          color: const Color(0xFFF5DCE4),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Row(
@@ -335,7 +335,7 @@ class _AdminCreateCommunityScreenState
                           children: [
                             Icon(
                               Icons.info_outline_rounded,
-                              color: Color(0xFF800020),
+                              color: Color(0xFF7A1736),
                             ),
                             SizedBox(width: 12),
                             Expanded(
@@ -360,7 +360,7 @@ class _AdminCreateCommunityScreenState
                       ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(56),
-                        backgroundColor: const Color(0xFF800020),
+                        backgroundColor: const Color(0xFF7A1736),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),

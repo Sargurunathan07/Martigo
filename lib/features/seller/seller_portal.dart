@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../widgets/app_gradient_background.dart';
 
 import 'community/seller_community_management_screen.dart';
 
@@ -12,15 +16,15 @@ import 'preorders/seller_preorders_connected_screen.dart';
 import 'demand/seller_demand_connected_screen.dart';
 
 import 'seller_mock_data.dart';
-import 'products/seller_products_connected_screen.dart';
+import 'seller_models.dart';
 import 'stock/seller_stock_connected_screen.dart';
 
 class MartigoSellerColors {
-  static const maroon = Color(0xFF800020);
-  static const deepMaroon = Color(0xFF5A0015);
-  static const softMaroon = Color(0xFFF5E1E5);
-  static const cream = Color(0xFFFFF7F0);
-  static const background = Color(0xFFFFFDFC);
+  static const maroon = Color(0xFF7A1736);
+  static const deepMaroon = Color(0xFF5A0018);
+  static const softMaroon = Color(0xFFD99AAF);
+  static const cream = Color(0xFFF5DCE4);
+  static const background = Color(0xFFFFFFFF);
   static const text = Color(0xFF292323);
 }
 
@@ -32,16 +36,19 @@ class SellerPortalApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Martigo Seller',
+      builder: (context, child) {
+        return AppGradientBackground(child: child ?? const SizedBox.shrink());
+      },
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: MartigoSellerColors.background,
+        scaffoldBackgroundColor: Colors.transparent,
         colorScheme: ColorScheme.fromSeed(
           seedColor: MartigoSellerColors.maroon,
           primary: MartigoSellerColors.maroon,
           surface: MartigoSellerColors.background,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: MartigoSellerColors.background,
+          backgroundColor: Colors.transparent,
           foregroundColor: MartigoSellerColors.text,
           elevation: 0,
         ),
@@ -162,7 +169,7 @@ class SellerWelcomeScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Create Seller Account'),
+                child: const Text('Start 14-Day Free Trial'),
               ),
               const SizedBox(height: 14),
               OutlinedButton(
@@ -249,8 +256,30 @@ class _SellerRegistrationScreenState extends State<SellerRegistrationScreen> {
                 field('Create Password', Icons.lock_outline, password: true),
                 const SizedBox(height: 10),
                 FilledButton(
-                  onPressed: () {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                  onPressed: () async {
+                    if (!(_formKey.currentState?.validate() ?? false)) {
+                      return;
+                    }
+
+                    final store = SellerDataStore.instance;
+
+                    final started = await store.startFreeTrial();
+
+                    if (!context.mounted) {
+                      return;
+                    }
+
+                    if (started || store.hasPortalAccess) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SellerDashboardShell(),
+                        ),
+                        (_) => false,
+                      );
+
+                      return;
+                    }
 
                     Navigator.pushReplacement(
                       context,
@@ -259,7 +288,15 @@ class _SellerRegistrationScreenState extends State<SellerRegistrationScreen> {
                       ),
                     );
                   },
-                  child: const Text('Create Account'),
+                  child: const Text('Start 14-Day Free Trial'),
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'No payment required. Full seller access for 14 days.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ],
             ),
@@ -370,8 +407,42 @@ class SellerMembershipScreen extends StatelessWidget {
     'Priority Support',
   ];
 
+  Future<void> _startTrial(BuildContext context) async {
+    final store = SellerDataStore.instance;
+
+    final started = await store.startFreeTrial();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    if (started) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const SellerDashboardShell()),
+        (_) => false,
+      );
+
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('The free trial has already been used.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final store = SellerDataStore.instance;
+
+    final membership = store.membership;
+
+    final trialActive = membership.isTrialActive;
+
+    final membershipActive = membership.status == MembershipStatus.active;
+
+    final canStartTrial = !store.trialUsed && !membershipActive;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Seller Membership')),
       body: sellerPageFrame(
@@ -394,7 +465,9 @@ class SellerMembershipScreen extends StatelessWidget {
                       size: 54,
                       color: MartigoSellerColors.maroon,
                     ),
+
                     const SizedBox(height: 14),
+
                     const Text(
                       'Martigo Seller Membership',
                       textAlign: TextAlign.center,
@@ -403,7 +476,53 @@ class SellerMembershipScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 14),
+
+                    const SizedBox(height: 12),
+
+                    if (trialActive) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: MartigoSellerColors.softMaroon,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          '${store.trialDaysRemaining} '
+                          '${store.trialDaysRemaining == 1 ? 'DAY' : 'DAYS'} '
+                          'OF TRIAL LEFT',
+                          style: const TextStyle(
+                            color: MartigoSellerColors.deepMaroon,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+                    ] else if (membershipActive) ...[
+                      const Text(
+                        'ACTIVE',
+                        style: TextStyle(
+                          color: MartigoSellerColors.maroon,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+                    ] else if (store.trialExpired) ...[
+                      const Text(
+                        '14-DAY TRIAL ENDED',
+                        style: TextStyle(
+                          color: MartigoSellerColors.maroon,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+                    ],
+
                     const Text(
                       '₹1,000',
                       style: TextStyle(
@@ -412,16 +531,21 @@ class SellerMembershipScreen extends StatelessWidget {
                         color: MartigoSellerColors.deepMaroon,
                       ),
                     ),
+
                     const Text(
-                      '/ month',
+                      '/ month after trial',
                       style: TextStyle(color: Colors.black54),
                     ),
+
                     const SizedBox(height: 6),
+
                     const Text(
-                      'Billed monthly • Cancel anytime',
+                      '14 days free • Cancel anytime',
                       style: TextStyle(color: Colors.black54),
                     ),
+
                     const SizedBox(height: 26),
+
                     ...benefits.map(
                       (benefit) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
@@ -440,24 +564,88 @@ class SellerMembershipScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
               const SizedBox(height: 24),
-              FilledButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SellerPaymentScreen(),
-                    ),
-                  );
-                },
-                child: const Text('Subscribe Now – ₹1,000 / month'),
-              ),
+
+              if (membershipActive)
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SellerDashboardShell(),
+                      ),
+                      (_) => false,
+                    );
+                  },
+                  child: const Text('Go to Dashboard'),
+                )
+              else if (canStartTrial) ...[
+                FilledButton.icon(
+                  onPressed: () => _startTrial(context),
+                  icon: const Icon(Icons.card_giftcard_rounded),
+                  label: const Text('Start 14-Day Free Trial'),
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'No payment required for the free trial.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 16),
+
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SellerPaymentScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Subscribe Now – ₹1,000 / month'),
+                ),
+              ] else ...[
+                FilledButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SellerPaymentScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Subscribe Now – ₹1,000 / month'),
+                ),
+              ],
+
+              if (trialActive) ...[
+                const SizedBox(height: 12),
+
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SellerPaymentScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Subscribe Before Trial Ends'),
+                ),
+              ],
+
               const SizedBox(height: 12),
-              const Text(
-                'Secure payment by Razorpay',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-              ),
+
+              if (!membershipActive)
+                const Text(
+                  'Secure payment by Razorpay',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
             ],
           ),
         ),
@@ -505,7 +693,13 @@ class SellerPaymentScreen extends StatelessWidget {
               ),
               const Spacer(),
               FilledButton(
-                onPressed: () {
+                onPressed: () async {
+                  await SellerDataStore.instance.activateMembership();
+
+                  if (!context.mounted) {
+                    return;
+                  }
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -612,6 +806,116 @@ class SellerPaymentSuccessScreen extends StatelessWidget {
   }
 }
 
+class SellerAccessRequiredScreen extends StatelessWidget {
+  const SellerAccessRequiredScreen({super.key});
+
+  Future<void> _startTrial(BuildContext context) async {
+    final started = await SellerDataStore.instance.startFreeTrial();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    if (started) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SellerDashboardShell()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final store = SellerDataStore.instance;
+
+    final expired = store.trialExpired;
+
+    return Scaffold(
+      body: sellerPageFrame(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 88,
+                height: 88,
+                decoration: const BoxDecoration(
+                  color: MartigoSellerColors.softMaroon,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  expired
+                      ? Icons.hourglass_disabled_rounded
+                      : Icons.workspace_premium_rounded,
+                  size: 46,
+                  color: MartigoSellerColors.maroon,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Text(
+                expired
+                    ? 'Your free trial has ended'
+                    : 'Seller membership required',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                expired
+                    ? 'Your products, communities and seller data are safe. Subscribe to continue using the Seller Portal.'
+                    : 'Start your 14-day free trial to use the Martigo Seller Portal.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54, height: 1.5),
+              ),
+
+              const SizedBox(height: 30),
+
+              if (!store.trialUsed)
+                FilledButton.icon(
+                  onPressed: () => _startTrial(context),
+                  icon: const Icon(Icons.card_giftcard_rounded),
+                  label: const Text('Start 14-Day Free Trial'),
+                ),
+
+              if (!store.trialUsed) const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SellerMembershipScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('View Membership'),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                '₹1,000 / month',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SellerDashboardShell extends StatefulWidget {
   const SellerDashboardShell({super.key});
 
@@ -622,15 +926,75 @@ class SellerDashboardShell extends StatefulWidget {
 class _SellerDashboardShellState extends State<SellerDashboardShell> {
   int index = 0;
 
+  bool _membershipLoading = true;
+
+  Timer? _trialExpiryTimer;
+
   @override
   void initState() {
     super.initState();
 
-    SellerCommunitySession.instance.load();
+    _loadSellerState();
+  }
+
+  Future<void> _loadSellerState() async {
+    await SellerDataStore.instance.loadMembership();
+
+    await SellerCommunitySession.instance.load();
+
+    _scheduleTrialExpiry();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _membershipLoading = false;
+    });
+  }
+
+  void _scheduleTrialExpiry() {
+    _trialExpiryTimer?.cancel();
+
+    final membership = SellerDataStore.instance.membership;
+
+    final end = membership.trialEndDate;
+
+    if (!membership.isTrialActive || end == null) {
+      return;
+    }
+
+    final remaining = end.difference(DateTime.now());
+
+    if (remaining <= Duration.zero) {
+      return;
+    }
+
+    _trialExpiryTimer = Timer(remaining, () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _trialExpiryTimer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_membershipLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final store = SellerDataStore.instance;
+
+    if (!store.hasPortalAccess) {
+      return const SellerAccessRequiredScreen();
+    }
+
     return ValueListenableBuilder<Community?>(
       valueListenable: SellerCommunitySession.instance.activeCommunity,
       builder: (context, community, _) {
@@ -638,21 +1002,22 @@ class _SellerDashboardShellState extends State<SellerDashboardShell> {
 
         final pages = <Widget>[
           SellerDynamicHomeScreen(community: community, isCanteen: isCanteen),
-          ConnectedSellerProductsPage(isCanteen: isCanteen),
           const ConnectedSellerPreOrdersPage(),
           ConnectedSellerStockPage(isCanteen: isCanteen),
           const SellerProfilePage(),
         ];
 
+        final safeIndex = index.clamp(0, pages.length - 1).toInt();
+
         return Scaffold(
           body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
-              child: pages[index],
+              child: pages[safeIndex],
             ),
           ),
           bottomNavigationBar: NavigationBar(
-            selectedIndex: index,
+            selectedIndex: safeIndex,
             onDestinationSelected: (value) {
               setState(() {
                 index = value;
@@ -663,17 +1028,6 @@ class _SellerDashboardShellState extends State<SellerDashboardShell> {
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home_rounded),
                 label: 'Home',
-              ),
-              NavigationDestination(
-                icon: Icon(
-                  isCanteen
-                      ? Icons.restaurant_menu_outlined
-                      : Icons.inventory_2_outlined,
-                ),
-                selectedIcon: Icon(
-                  isCanteen ? Icons.restaurant_menu : Icons.inventory_2_rounded,
-                ),
-                label: isCanteen ? 'Menu' : 'Products',
               ),
               const NavigationDestination(
                 icon: Icon(Icons.event_note_outlined),
@@ -1719,12 +2073,36 @@ class SellerSubscriptionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final store = SellerDataStore.instance;
+
+    final membership = store.membership;
+
+    final active = membership.status == MembershipStatus.active;
+
+    final trial = membership.isTrialActive;
+
+    final String status;
+
+    if (active) {
+      status = 'ACTIVE';
+    } else if (trial) {
+      status = 'FREE TRIAL';
+    } else if (store.trialExpired) {
+      status = 'TRIAL ENDED';
+    } else {
+      status = 'INACTIVE';
+    }
+
+    final nextBilling = membership.nextBillingDate;
+
+    final trialEnd = membership.trialEndDate;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Subscription')),
       body: sellerPageFrame(
         child: ListView(
           padding: const EdgeInsets.all(24),
-          children: const [
+          children: [
             SellerCard(
               background: MartigoSellerColors.softMaroon,
               child: Column(
@@ -1732,12 +2110,14 @@ class SellerSubscriptionScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.workspace_premium_rounded,
                         color: MartigoSellerColors.maroon,
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
+
+                      const SizedBox(width: 10),
+
+                      const Expanded(
                         child: Text(
                           'Martigo Seller Membership',
                           style: TextStyle(
@@ -1746,41 +2126,102 @@ class SellerSubscriptionScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      StatusBadge(text: 'ACTIVE'),
+
+                      StatusBadge(text: status),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    '₹1,000 / month',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: MartigoSellerColors.deepMaroon,
+
+                  const SizedBox(height: 20),
+
+                  if (trial) ...[
+                    Text(
+                      '${store.trialDaysRemaining} '
+                      '${store.trialDaysRemaining == 1 ? 'day' : 'days'} remaining',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: MartigoSellerColors.deepMaroon,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text('Next billing date: 03 October'),
-                  Text('Payment Method: Razorpay'),
+
+                    const SizedBox(height: 8),
+
+                    if (trialEnd != null)
+                      Text(
+                        'Trial ends: '
+                        '${MaterialLocalizations.of(context).formatMediumDate(trialEnd)}',
+                      ),
+
+                    const SizedBox(height: 8),
+
+                    const Text('₹1,000 / month after your free trial.'),
+                  ] else ...[
+                    const Text(
+                      '₹1,000 / month',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: MartigoSellerColors.deepMaroon,
+                      ),
+                    ),
+
+                    if (active && nextBilling != null) ...[
+                      const SizedBox(height: 10),
+
+                      Text(
+                        'Next billing date: '
+                        '${MaterialLocalizations.of(context).formatMediumDate(nextBilling)}',
+                      ),
+                    ],
+
+                    if (active)
+                      Text(
+                        'Payment Method: '
+                        '${membership.paymentMethod}',
+                      ),
+                  ],
                 ],
               ),
             ),
-            SizedBox(height: 18),
-            ProfileOption(
+
+            const SizedBox(height: 20),
+
+            if (!active)
+              FilledButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SellerPaymentScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Subscribe – ₹1,000 / month'),
+              ),
+
+            const SizedBox(height: 18),
+
+            const ProfileOption(
               icon: Icons.receipt_long_outlined,
               title: 'Payment History',
             ),
-            ProfileOption(
-              icon: Icons.settings_outlined,
-              title: 'Manage Subscription',
-            ),
-            ProfileOption(
+
+            if (active)
+              const ProfileOption(
+                icon: Icons.settings_outlined,
+                title: 'Manage Subscription',
+              ),
+
+            const ProfileOption(
               icon: Icons.credit_card_outlined,
               title: 'Billing Details',
             ),
-            ProfileOption(
-              icon: Icons.cancel_outlined,
-              title: 'Cancel Subscription',
-            ),
+
+            if (active)
+              const ProfileOption(
+                icon: Icons.cancel_outlined,
+                title: 'Cancel Subscription',
+              ),
           ],
         ),
       ),

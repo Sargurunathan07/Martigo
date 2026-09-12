@@ -67,7 +67,7 @@ class _SellerCommunityManagementScreenState
     final active = SellerCommunitySession.instance.current;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: const BackButton(),
         title: const Text('Communities'),
@@ -340,7 +340,7 @@ class _SellerCreateCommunityScreenState
     final isCollege = type == CommunityType.college;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: const BackButton(),
         title: const Text('Create Community'),

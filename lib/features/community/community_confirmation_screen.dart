@@ -32,7 +32,7 @@ class CommunityConfirmationScreen extends StatelessWidget {
                   Icon(
                     isCollege ? Icons.school_rounded : Icons.apartment_rounded,
                     size: 80,
-                    color: const Color(0xFF800020),
+                    color: const Color(0xFF7A1736),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -75,7 +75,7 @@ class CommunityConfirmationScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF800020),
+                        backgroundColor: const Color(0xFF7A1736),
                         foregroundColor: Colors.white,
                       ),
                       child: const Text(
@@ -89,7 +89,7 @@ class CommunityConfirmationScreen extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     child: const Text(
                       'Not your community? Go back',
-                      style: TextStyle(color: Color(0xFF800020)),
+                      style: TextStyle(color: Color(0xFF7A1736)),
                     ),
                   ),
                 ],
@@ -119,13 +119,13 @@ class _InfoTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7F0),
+        color: const Color(0xFFF5DCE4),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF5E1E5)),
+        border: Border.all(color: const Color(0xFFD99AAF)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF800020)),
+          Icon(icon, color: const Color(0xFF7A1736)),
           const SizedBox(width: 15),
           Expanded(
             child: Column(

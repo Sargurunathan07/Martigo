@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
-import '../../core/constants/app_colors.dart';
 import '../../widgets/app_state_view.dart';
 
 class NotFoundScreen extends StatelessWidget {
@@ -10,7 +9,7 @@ class NotFoundScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: Navigator.of(context).canPop() ? const BackButton() : null,
       ),

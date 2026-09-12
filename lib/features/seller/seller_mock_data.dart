@@ -1,11 +1,29 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'seller_models.dart';
 
-/// Centralized, mutable in-memory mock data for the Seller Portal.
-/// No backend, no persistence beyond the current app session.
+/// Centralized mutable development data for the Seller Portal.
+///
+/// Seller trial/membership state is persisted locally so restarting
+/// Martigo does not reset the 14-day trial.
 class SellerDataStore {
   SellerDataStore._internal();
+
   static final SellerDataStore instance = SellerDataStore._internal();
+
   factory SellerDataStore() => instance;
+
+  static const String _membershipStatusKey = 'martigo_seller_membership_status';
+
+  static const String _trialUsedKey = 'martigo_seller_trial_used';
+
+  static const String _trialStartKey = 'martigo_seller_trial_start';
+
+  static const String _trialEndKey = 'martigo_seller_trial_end';
+
+  static const String _nextBillingKey = 'martigo_seller_next_billing';
+
+  bool trialUsed = false;
 
   Seller seller = Seller(
     businessName: 'Sunrise Supermarket',
@@ -22,9 +40,137 @@ class SellerDataStore {
     paymentMethod: 'Razorpay',
   );
 
-  void activateMembership() {
+  Future<void> loadMembership() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final savedStatus = prefs.getString(_membershipStatusKey);
+
+    if (savedStatus != null) {
+      membership.status = MembershipStatus.values.firstWhere(
+        (status) => status.name == savedStatus,
+        orElse: () => MembershipStatus.inactive,
+      );
+    }
+
+    trialUsed = prefs.getBool(_trialUsedKey) ?? false;
+
+    final trialStart = prefs.getString(_trialStartKey);
+
+    final trialEnd = prefs.getString(_trialEndKey);
+
+    final nextBilling = prefs.getString(_nextBillingKey);
+
+    membership.trialStartDate = trialStart == null
+        ? null
+        : DateTime.tryParse(trialStart);
+
+    membership.trialEndDate = trialEnd == null
+        ? null
+        : DateTime.tryParse(trialEnd);
+
+    membership.nextBillingDate = nextBilling == null
+        ? null
+        : DateTime.tryParse(nextBilling);
+
+    if (membership.isTrialExpired) {
+      membership.status = MembershipStatus.inactive;
+
+      await _saveMembership();
+    }
+  }
+
+  Future<void> _saveMembership() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(_membershipStatusKey, membership.status.name);
+
+    await prefs.setBool(_trialUsedKey, trialUsed);
+
+    final trialStart = membership.trialStartDate;
+
+    if (trialStart == null) {
+      await prefs.remove(_trialStartKey);
+    } else {
+      await prefs.setString(_trialStartKey, trialStart.toIso8601String());
+    }
+
+    final trialEnd = membership.trialEndDate;
+
+    if (trialEnd == null) {
+      await prefs.remove(_trialEndKey);
+    } else {
+      await prefs.setString(_trialEndKey, trialEnd.toIso8601String());
+    }
+
+    final nextBilling = membership.nextBillingDate;
+
+    if (nextBilling == null) {
+      await prefs.remove(_nextBillingKey);
+    } else {
+      await prefs.setString(_nextBillingKey, nextBilling.toIso8601String());
+    }
+  }
+
+  Future<bool> startFreeTrial() async {
+    await loadMembership();
+
+    if (membership.isTrialActive) {
+      return true;
+    }
+
+    if (trialUsed || membership.status == MembershipStatus.active) {
+      return false;
+    }
+
+    final now = DateTime.now();
+
+    membership.status = MembershipStatus.trial;
+
+    membership.trialStartDate = now;
+
+    membership.trialEndDate = now.add(const Duration(days: 14));
+
+    membership.nextBillingDate = null;
+
+    trialUsed = true;
+
+    await _saveMembership();
+
+    return true;
+  }
+
+  Future<void> activateMembership() async {
+    await loadMembership();
+
     membership.status = MembershipStatus.active;
+
     membership.nextBillingDate = DateTime.now().add(const Duration(days: 30));
+
+    await _saveMembership();
+  }
+
+  bool get hasPortalAccess {
+    if (membership.status == MembershipStatus.active) {
+      return true;
+    }
+
+    return membership.isTrialActive;
+  }
+
+  bool get trialExpired {
+    final end = membership.trialEndDate;
+
+    if (!trialUsed ||
+        end == null ||
+        membership.status == MembershipStatus.active) {
+      return false;
+    }
+
+    return !DateTime.now().isBefore(end);
+  }
+
+  int get trialDaysRemaining {
+    return membership.trialDaysRemaining;
   }
 
   final List<SellerProduct> products = [

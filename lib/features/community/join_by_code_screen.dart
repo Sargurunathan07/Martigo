@@ -81,7 +81,7 @@ class _JoinByCodeScreenState extends State<JoinByCodeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: const BackButton(),
         title: Text(isCollege ? 'Join College' : 'Join Apartment'),

@@ -41,7 +41,7 @@ class _ConnectedSellerStockPageState extends State<ConnectedSellerStockPage> {
     final low = store.lowAvailabilityForMode(widget.isCanteen);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),

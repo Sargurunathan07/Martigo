@@ -177,7 +177,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.customerHome,
       (route) => false,
-      arguments: 2,
+      arguments: 1,
     );
   }
 

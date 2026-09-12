@@ -14,7 +14,7 @@ class SellerWelcomeScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: ResponsiveMobileContainer(
           child: Padding(

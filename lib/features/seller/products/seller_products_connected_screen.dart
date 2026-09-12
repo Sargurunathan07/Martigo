@@ -136,7 +136,7 @@ class _ConnectedSellerProductsPageState
     final addLabel = widget.isCanteen ? 'Add Food Item' : 'Add Product';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addProduct,
         backgroundColor: AppColors.primaryMaroon,
@@ -442,7 +442,7 @@ class _SellerProductFormScreenState extends State<SellerProductFormScreen> {
     final item = widget.isCanteen ? 'Food Item' : 'Product';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         leading: const BackButton(),
         title: Text(editing ? 'Edit $item' : 'Add $item'),

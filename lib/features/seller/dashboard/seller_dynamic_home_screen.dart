@@ -4,8 +4,10 @@ import '../../../core/constants/app_colors.dart';
 import '../../../models/community.dart';
 import '../../../widgets/app_card.dart';
 import '../seller_mock_data.dart';
+import 'seller_trial_banner.dart';
+import 'seller_products_home_section.dart';
 
-class SellerDynamicHomeScreen extends StatelessWidget {
+class SellerDynamicHomeScreen extends StatefulWidget {
   final Community? community;
   final bool isCanteen;
 
@@ -16,17 +18,30 @@ class SellerDynamicHomeScreen extends StatelessWidget {
   });
 
   @override
+  State<SellerDynamicHomeScreen> createState() =>
+      _SellerDynamicHomeScreenState();
+}
+
+class _SellerDynamicHomeScreenState extends State<SellerDynamicHomeScreen> {
+  void _refreshHome() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final store = SellerDataStore.instance;
 
-    final items = store.productsForMode(isCanteen);
+    final items = store.productsForMode(widget.isCanteen);
 
-    final low = store.lowAvailabilityForMode(isCanteen);
+    final low = store.lowAvailabilityForMode(widget.isCanteen);
 
-    final businessName = community?.businessName ?? store.seller.businessName;
+    final businessName =
+        widget.community?.businessName ?? store.seller.businessName;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -43,7 +58,11 @@ class SellerDynamicHomeScreen extends StatelessWidget {
 
             Text(businessName, style: const TextStyle(color: Colors.black54)),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            const SellerTrialBanner(),
+
+            if (store.membership.isTrialActive) const SizedBox(height: 16),
 
             AppCard(
               child: Row(
@@ -56,28 +75,34 @@ class SellerDynamicHomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
-                      isCanteen ? Icons.restaurant : Icons.storefront,
+                      widget.isCanteen ? Icons.restaurant : Icons.storefront,
                       color: AppColors.primaryMaroon,
                       size: 30,
                     ),
                   ),
+
                   const SizedBox(width: 14),
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isCanteen ? 'Canteen Mode' : 'Supermarket Mode',
+                          widget.isCanteen
+                              ? 'Canteen Mode'
+                              : 'Supermarket Mode',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+
                         const SizedBox(height: 3),
+
                         Text(
-                          community == null
+                          widget.community == null
                               ? 'Create or select a community from Profile → Communities.'
-                              : community!.name,
+                              : widget.community!.name,
                           style: const TextStyle(color: Colors.black54),
                         ),
                       ],
@@ -93,14 +118,16 @@ class SellerDynamicHomeScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _MetricCard(
-                    icon: isCanteen
+                    icon: widget.isCanteen
                         ? Icons.restaurant_menu
                         : Icons.inventory_2_outlined,
                     value: '${items.length}',
-                    label: isCanteen ? 'Menu Items' : 'Products',
+                    label: widget.isCanteen ? 'Menu Items' : 'Products',
                   ),
                 ),
+
                 const SizedBox(width: 10),
+
                 Expanded(
                   child: _MetricCard(
                     icon: Icons.event_note_outlined,
@@ -108,73 +135,28 @@ class SellerDynamicHomeScreen extends StatelessWidget {
                     label: 'Today',
                   ),
                 ),
+
                 const SizedBox(width: 10),
+
                 Expanded(
                   child: _MetricCard(
                     icon: Icons.warning_amber_rounded,
                     value: '${low.length}',
-                    label: isCanteen ? 'Low Qty' : 'Low Stock',
+                    label: widget.isCanteen ? 'Low Qty' : 'Low Stock',
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 26),
+            const SizedBox(height: 28),
 
-            Text(
-              isCanteen ? 'Today\'s Menu' : 'Product Overview',
-              style: Theme.of(context).textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+            SellerProductsHomeSection(
+              key: ValueKey(widget.isCanteen),
+              isCanteen: widget.isCanteen,
+              onChanged: _refreshHome,
             ),
 
-            const SizedBox(height: 12),
-
-            ...items
-                .take(5)
-                .map(
-                  (product) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: AppCard(
-                      child: Row(
-                        children: [
-                          Icon(
-                            isCanteen
-                                ? Icons.restaurant_outlined
-                                : Icons.inventory_2_outlined,
-                            color: AppColors.primaryMaroon,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  product.category,
-                                  style: const TextStyle(color: Colors.black54),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            isCanteen
-                                ? '${product.stock} available'
-                                : '${product.stock} in stock',
-                            style: const TextStyle(
-                              color: AppColors.primaryMaroon,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -199,12 +181,16 @@ class _MetricCard extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: AppColors.primaryMaroon),
+
           const SizedBox(height: 8),
+
           Text(
             value,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
+
           const SizedBox(height: 3),
+
           Text(
             label,
             textAlign: TextAlign.center,

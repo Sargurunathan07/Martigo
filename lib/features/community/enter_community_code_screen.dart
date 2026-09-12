@@ -78,7 +78,7 @@ class _EnterCommunityCodeScreenState extends State<EnterCommunityCodeScreen> {
                   const Icon(
                     Icons.pin_rounded,
                     size: 64,
-                    color: Color(0xFF800020),
+                    color: Color(0xFF7A1736),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -104,7 +104,7 @@ class _EnterCommunityCodeScreenState extends State<EnterCommunityCodeScreen> {
                       prefixIcon: const Icon(Icons.tag_rounded),
                       errorText: _errorMessage,
                       filled: true,
-                      fillColor: const Color(0xFFFFF7F0),
+                      fillColor: const Color(0xFFF5DCE4),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -129,7 +129,7 @@ class _EnterCommunityCodeScreenState extends State<EnterCommunityCodeScreen> {
                     child: ElevatedButton(
                       onPressed: _findCommunity,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF800020),
+                        backgroundColor: const Color(0xFF7A1736),
                         foregroundColor: Colors.white,
                       ),
                       child: const Text(

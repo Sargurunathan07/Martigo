@@ -135,7 +135,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                     setState(() => _selected = _AdminSection.values[index]);
                   },
                   labelType: NavigationRailLabelType.all,
-                  backgroundColor: AppColors.cream,
+                  backgroundColor: Colors.white,
                   selectedIconTheme: const IconThemeData(
                     color: AppColors.primaryMaroon,
                   ),

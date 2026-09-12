@@ -15,7 +15,7 @@ extension PreOrderStatusX on PreOrderStatus {
   }
 }
 
-enum MembershipStatus { inactive, active }
+enum MembershipStatus { inactive, trial, active }
 
 class Seller {
   String businessName;
@@ -37,16 +37,64 @@ class SellerMembership {
   MembershipStatus status;
   final String planName;
   final double monthlyPrice;
+
+  DateTime? trialStartDate;
+  DateTime? trialEndDate;
   DateTime? nextBillingDate;
+
   final String paymentMethod;
 
   SellerMembership({
     required this.status,
     required this.planName,
     required this.monthlyPrice,
+    this.trialStartDate,
+    this.trialEndDate,
     this.nextBillingDate,
     required this.paymentMethod,
   });
+
+  bool isTrialActiveAt(DateTime now) {
+    final end = trialEndDate;
+
+    if (status != MembershipStatus.trial || end == null) {
+      return false;
+    }
+
+    return now.isBefore(end);
+  }
+
+  bool isTrialExpiredAt(DateTime now) {
+    final end = trialEndDate;
+
+    if (status != MembershipStatus.trial || end == null) {
+      return false;
+    }
+
+    return !now.isBefore(end);
+  }
+
+  int trialDaysRemainingAt(DateTime now) {
+    if (!isTrialActiveAt(now)) {
+      return 0;
+    }
+
+    final remaining = trialEndDate!.difference(now);
+
+    return (remaining.inMilliseconds / Duration.millisecondsPerDay).ceil();
+  }
+
+  bool get isTrialActive {
+    return isTrialActiveAt(DateTime.now());
+  }
+
+  bool get isTrialExpired {
+    return isTrialExpiredAt(DateTime.now());
+  }
+
+  int get trialDaysRemaining {
+    return trialDaysRemainingAt(DateTime.now());
+  }
 }
 
 class SellerProduct {
@@ -83,6 +131,7 @@ class SellerPreOrder {
   final String pickupTime;
   final List<SellerPreOrderItem> items;
   final double total;
+
   PreOrderStatus status;
 
   SellerPreOrder({
@@ -109,7 +158,9 @@ class DemandSummary {
 
   const DemandSummary({required this.dateLabel, required this.entries});
 
-  int get totalItems => entries.fold(0, (sum, e) => sum + e.quantity);
+  int get totalItems {
+    return entries.fold(0, (sum, entry) => sum + entry.quantity);
+  }
 }
 
 class SellerNotification {
