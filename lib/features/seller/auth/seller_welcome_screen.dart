@@ -14,7 +14,7 @@ class SellerWelcomeScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: ResponsiveMobileContainer(
           child: Padding(
@@ -30,7 +30,7 @@ class SellerWelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 Text('Seller Portal', style: textTheme.titleMedium),
-                const Spacer(),
+                const SizedBox(height: 64),
                 Center(
                   child: Container(
                     width: 96,
@@ -48,11 +48,20 @@ class SellerWelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('Welcome to Martigo', style: textTheme.headlineMedium),
+                Center(
+                  child: Text(
+                    'Welcome to Martigo',
+                    textAlign: TextAlign.center,
+                    style: textTheme.headlineMedium,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(
-                  'Manage your store, stock and pre-orders easily.',
-                  style: textTheme.bodyMedium,
+                Center(
+                  child: Text(
+                    'Manage your store, stock and pre-orders easily.',
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyMedium,
+                  ),
                 ),
                 const Spacer(),
                 AppButton(
