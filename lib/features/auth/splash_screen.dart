@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
@@ -14,16 +16,25 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
-    _navigateNext();
+
+    _navigationTimer = Timer(AppConstants.splashDuration, _navigateNext);
   }
 
-  Future<void> _navigateNext() async {
-    await Future.delayed(AppConstants.splashDuration);
+  void _navigateNext() {
     if (!mounted) return;
+
     Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+  }
+
+  @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
   }
 
   @override
