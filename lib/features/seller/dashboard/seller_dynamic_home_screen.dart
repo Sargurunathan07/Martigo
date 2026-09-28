@@ -41,7 +41,7 @@ class _SellerDynamicHomeScreenState extends State<SellerDynamicHomeScreen> {
         widget.community?.businessName ?? store.seller.businessName;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/routes.dart';
 import '../../../core/utils/validators.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_text_field.dart';
@@ -22,6 +23,7 @@ class _SellerRegisterScreenState extends State<SellerRegisterScreen> {
   final _addressController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _acceptedLegal = false;
 
   @override
   void dispose() {
@@ -36,6 +38,17 @@ class _SellerRegisterScreenState extends State<SellerRegisterScreen> {
 
   Future<void> _onCreateAccountPressed() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (!_acceptedLegal) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please accept the Terms & Conditions and Privacy Policy.',
+          ),
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
     // Mock registration delay — no backend involved.
@@ -122,7 +135,38 @@ class _SellerRegisterScreenState extends State<SellerRegisterScreen> {
                     obscureText: true,
                     validator: Validators.validatePassword,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+
+                  Semantics(
+                    label: 'Accept Martigo Terms and Conditions and Privacy Policy',
+                    child: CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      value: _acceptedLegal,
+                      onChanged: (value) {
+                        setState(() {
+                          _acceptedLegal = value ?? false;
+                        });
+                      },
+                      title: const Text(
+                        'I agree to the Terms & Conditions and Privacy Policy.',
+                      ),
+                      subtitle: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.centerLeft,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(AppRoutes.legalCenter);
+                        },
+                        child: const Text('Read Legal & Privacy'),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
                   AppButton(
                     label: 'Create Seller Account',
                     isLoading: _isLoading,

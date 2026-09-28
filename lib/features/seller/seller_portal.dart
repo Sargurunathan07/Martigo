@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/app_gradient_background.dart';
-
 import 'community/seller_community_management_screen.dart';
 
 import '../../app/routes.dart';
@@ -20,10 +18,10 @@ import 'seller_models.dart';
 import 'stock/seller_stock_connected_screen.dart';
 
 class MartigoSellerColors {
-  static const maroon = Color(0xFF7A1736);
-  static const deepMaroon = Color(0xFF5A0018);
-  static const softMaroon = Color(0xFFD99AAF);
-  static const cream = Color(0xFFF5DCE4);
+  static const maroon = Color(0xFF800020);
+  static const deepMaroon = Color(0xFF5A0015);
+  static const softMaroon = Color(0xFFF5E1E5);
+  static const cream = Color(0xFFFFF7F0);
   static const background = Color(0xFFFFFFFF);
   static const text = Color(0xFF292323);
 }
@@ -36,19 +34,20 @@ class SellerPortalApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Martigo Seller',
-      builder: (context, child) {
-        return AppGradientBackground(child: child ?? const SizedBox.shrink());
-      },
+      themeMode: ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.transparent,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        canvasColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(
           seedColor: MartigoSellerColors.maroon,
           primary: MartigoSellerColors.maroon,
-          surface: MartigoSellerColors.background,
+          surface: Colors.white,
+          onSurface: MartigoSellerColors.text,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           foregroundColor: MartigoSellerColors.text,
           elevation: 0,
         ),
@@ -110,17 +109,20 @@ class SellerWelcomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 92,
-                height: 92,
-                decoration: BoxDecoration(
-                  color: MartigoSellerColors.softMaroon,
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                child: const Icon(
-                  Icons.storefront_rounded,
-                  size: 48,
-                  color: MartigoSellerColors.maroon,
+              Transform.translate(
+                offset: const Offset(0, -28),
+                child: Container(
+                  width: 92,
+                  height: 92,
+                  decoration: BoxDecoration(
+                    color: MartigoSellerColors.softMaroon,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: const Icon(
+                    Icons.storefront_rounded,
+                    size: 48,
+                    color: MartigoSellerColors.maroon,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -141,22 +143,29 @@ class SellerWelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 36),
-              const Text(
-                'Welcome to Martigo',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: MartigoSellerColors.text,
+              const Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'Welcome to Martigo',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: MartigoSellerColors.text,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Manage your store, stock and pre-orders easily.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                  height: 1.5,
+              const Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'Manage your store, stock and pre-orders easily.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    height: 1.5,
+                  ),
                 ),
               ),
               const SizedBox(height: 40),

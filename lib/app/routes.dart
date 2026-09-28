@@ -19,6 +19,7 @@ import '../features/customer/notifications_screen.dart';
 import '../features/customer/order_confirmation_screen.dart';
 import '../features/customer/product_details_screen.dart';
 import '../features/customer/profile_screen.dart';
+import '../features/legal/legal_center_screen.dart';
 import '../features/seller/auth/seller_welcome_screen.dart';
 import '../features/seller/dashboard/seller_home_shell.dart';
 import '../features/seller/preorders/seller_preorders_screen.dart';
@@ -51,6 +52,7 @@ class AppRoutes {
   static const String myOrders = '/my-orders';
   static const String notifications = '/notifications';
   static const String profile = '/profile';
+  static const String legalCenter = '/legal-center';
 
   // Seller
   static const String sellerWelcome = '/seller-welcome';
@@ -94,6 +96,7 @@ class AppRoutes {
     myOrders: (context) => const MyOrdersScreen(),
     notifications: (context) => const NotificationsScreen(),
     profile: (context) => const ProfileScreen(),
+    legalCenter: (context) => const LegalCenterScreen(),
 
     sellerWelcome: (context) => const SellerWelcomeScreen(),
     sellerDashboard: (context) => const SellerHomeShell(),

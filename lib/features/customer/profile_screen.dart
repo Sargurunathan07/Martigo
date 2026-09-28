@@ -188,6 +188,14 @@ class ProfileScreen extends StatelessWidget {
               onTap: () {},
             ),
 
+            _ProfileMenuTile(
+              icon: Icons.policy_outlined,
+              label: 'Legal & Privacy',
+              onTap: () {
+                Navigator.of(context).pushNamed(AppRoutes.legalCenter);
+              },
+            ),
+
             const Divider(height: 32),
 
             _ProfileMenuTile(

@@ -29,7 +29,7 @@ class ConnectedSellerDemandScreen extends StatelessWidget {
     final demand = store.aggregateDemand(orders);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: AppBar(title: Text(_periodTitle())),
       body: SafeArea(
         child: Center(

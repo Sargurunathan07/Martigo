@@ -32,7 +32,7 @@ class CustomerHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(community.businessName ?? 'Home'),
         centerTitle: false,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         foregroundColor: Colors.white,
         flexibleSpace: Container(
           decoration: const BoxDecoration(gradient: AppColors.maroonGradient),

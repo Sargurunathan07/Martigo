@@ -5,10 +5,10 @@ class AppTheme {
   AppTheme._();
 
   // Brand palette
-  static const Color primaryMaroon = Color(0xFF7A1736);
-  static const Color deepMaroon = Color(0xFF5A0018);
-  static const Color softMaroon = Color(0xFFD99AAF);
-  static const Color cream = Color(0xFFF5DCE4);
+  static const Color primaryMaroon = Color(0xFF800020);
+  static const Color deepMaroon = Color(0xFF5A0015);
+  static const Color softMaroon = Color(0xFFF5E1E5);
+  static const Color cream = Color(0xFFFFF7F0);
   static const Color backgroundColor = Color(0xFFFFFFFF);
   static const Color textColor = Color(0xFF292323);
 
@@ -23,7 +23,7 @@ class AppTheme {
         ).copyWith(
           primary: primaryMaroon,
           secondary: deepMaroon,
-          surface: cream,
+          surface: backgroundColor,
           onPrimary: cream,
           onSecondary: cream,
           onSurface: textColor,
@@ -36,6 +36,8 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: backgroundColor,
+      canvasColor: backgroundColor,
+      cardColor: backgroundColor,
       textTheme: baseTextTheme,
 
       appBarTheme: AppBarTheme(
@@ -126,7 +128,7 @@ class AppTheme {
       ),
 
       cardTheme: CardThemeData(
-        color: cream,
+        color: backgroundColor,
         elevation: 2,
         margin: const EdgeInsets.symmetric(
           vertical: _spacing / 2,
@@ -138,7 +140,7 @@ class AppTheme {
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: cream,
+        backgroundColor: backgroundColor,
         selectedItemColor: primaryMaroon,
         unselectedItemColor: textColor.withValues(alpha: 0.5),
         type: BottomNavigationBarType.fixed,

@@ -54,7 +54,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Navigator.of(context).canPop() ? const BackButton() : null,
         title: const Text('Choose Community'),

@@ -43,7 +43,7 @@ class _ConnectedSellerPreOrdersPageState
     final currentOrders = orders;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -304,7 +304,7 @@ class _SellerOrderDetailsScreenState extends State<SellerOrderDetailsScreen> {
     final order = widget.order;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: AppBar(title: Text('Order #${order.id}')),
       body: SafeArea(
         child: Center(

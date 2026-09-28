@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../features/common/not_found_screen.dart';
-import '../widgets/app_gradient_background.dart';
 import 'routes.dart';
 import 'theme.dart';
 
@@ -15,13 +14,10 @@ class App extends StatelessWidget {
       title: 'Martigo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      themeMode: ThemeMode.light,
 
       /// Purely visual wrapper.
       /// Navigation and route behavior remain unchanged.
-      builder: (context, child) {
-        return AppGradientBackground(child: child ?? const SizedBox.shrink());
-      },
-
       initialRoute: AppRoutes.initial,
       routes: AppRoutes.routes,
       onUnknownRoute: (_) {

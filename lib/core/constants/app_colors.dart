@@ -11,7 +11,7 @@ class AppColors {
 
   static const Color softMaroon = Color(0xFFF5E1E5);
   static const Color cream = Color(0xFFFFF7F0);
-  static const Color background = Color(0xFFFFFDFC);
+  static const Color background = Color(0xFFFFFFFF);
   static const Color text = Color(0xFF292323);
 
   static const LinearGradient maroonGradient = LinearGradient(
